@@ -2,32 +2,55 @@
 #include <raylib.h>
 
 Ball::Ball() 
-    : x(100)
-    , y(100)
+    : posX(100)
+    , posY(100)
     , speedX(5)
     , speedY(5)
     , radius(15) 
+    , friction(0.1)
 {
 }
 
 void Ball::Update() 
 {
-    x += speedX;
-    y += speedY;
-    
-    const int screenWidth = GetScreenWidth();
-    const int screenHeight = GetScreenHeight();
-    
-    if ((x + radius >= screenWidth) || (x - radius <= 0)) {
-        speedX *= -1;
+   if (IsKeyDown(KEY_D))
+    {
+        posX += speedX;
     }
-    
-    if ((y + radius >= screenHeight) || (y - radius <= 0)) {
-        speedY *= -1;
+    if (IsKeyDown(KEY_A))
+    {
+        posX -= speedX;
+    }
+    if (IsKeyDown(KEY_W))
+    {
+        posY -= speedY;
+    }
+    if (IsKeyDown(KEY_S))
+    {
+        posY += speedY;
+    }
+    else{
+
+        if(speedX > 0)
+        {
+            speedX -= friction;
+        }
+        if(speedX < 0)
+        {
+            speedX += friction;
+        }
+        if(speedY > 0)
+        {
+            speedY -= friction;
+        }
+        if(speedY < 0)
+        {
+            speedY += friction;
+        }
     }
 }
 
 void Ball::Draw() const
 {
-    DrawCircle(x, y, radius, WHITE);
+    DrawCircle(posX, posY, radius, WHITE);
 }

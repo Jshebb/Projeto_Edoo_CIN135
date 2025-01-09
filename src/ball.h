@@ -8,9 +8,10 @@ public:
     void Draw() const;
 
 private:
-    int x;
-    int y;
+    int posX;
+    int posY;
     int speedX;
     int speedY;
     int radius;
+    int friction;
 };

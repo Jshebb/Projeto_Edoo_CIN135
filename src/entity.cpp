@@ -7,6 +7,17 @@ Block::Block()  //default constructor
     , posX(100)
     , posY(100)
 {
+     //initialize the block rectangle
+    blockRec.x = posX;
+    blockRec.y = posY;
+    blockRec.width = width;
+    blockRec.height = height;
+
+    //initialize the rectangle top
+    topRec.x = posX;
+    topRec.y = height;
+    topRec.width = width;
+    topRec.height = 5;
 }
 
 Block::Block(int w, int h, int posX, int posY)  //constructor with parameters
@@ -15,6 +26,17 @@ Block::Block(int w, int h, int posX, int posY)  //constructor with parameters
     , posX(posX)
     , posY(posY)
 {
+    //initialize the block rectangle
+    blockRec.x = posX;
+    blockRec.y = posY;
+    blockRec.width = width;
+    blockRec.height = height;
+
+    //initialize the rectangle top
+    topRec.x = blockRec.x;
+    topRec.y = blockRec.y;
+    topRec.width = width;
+    topRec.height = 5;
 }
 
 //dimensions of the block getters
@@ -36,6 +58,18 @@ int Block::getPosX() const
 int Block::getPosY() const
 {
     return posY;
+}
+
+//get the rectangle of the block
+
+Rectangle Block::getRec()
+{
+    return blockRec;
+}
+
+Rectangle Block::getTopRec()
+{
+    return topRec;
 }
 
 //setters
@@ -62,4 +96,5 @@ void Block::setPosY(int y)
 void Block::Draw() const
 {
     DrawRectangle(posX, posY, width, height, RED);
+    DrawRectangle(topRec.x, topRec.y, width, topRec.height, BLUE);
 }

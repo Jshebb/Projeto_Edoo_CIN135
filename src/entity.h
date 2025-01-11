@@ -23,10 +23,16 @@ class Block{
         //draw the block
         void Draw() const;
 
+        //get the rectangle of the block
+        Rectangle getRec();
+        Rectangle getTopRec();
+
     private:
         int width;
         int height;
         int posX;
         int posY;
+        Rectangle blockRec;
+        Rectangle topRec;
 };
 #endif // BLOCK_H

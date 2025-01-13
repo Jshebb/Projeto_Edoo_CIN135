@@ -1,100 +1,134 @@
-#include <raylib.h>
 #include "entity.h"
+#include <cmath>
 
-Block::Block()  //default constructor
-    : width(50)
-    , height(50)
-    , posX(100)
-    , posY(100)
+// Tile Class Implementations
+Tile::Tile(float x, float y, float size, bool solid, Color color) 
+    : rect({x, y, size, size})
+    , solid(solid)
+    , color(color) 
+    , texture({0})
 {
-     //initialize the block rectangle
-    blockRec.x = posX;
-    blockRec.y = posY;
-    blockRec.width = width;
-    blockRec.height = height;
-
-    //initialize the rectangle top
-    topRec.x = posX;
-    topRec.y = height;
-    topRec.width = width;
-    topRec.height = 5;
 }
 
-Block::Block(int w, int h, int posX, int posY)  //constructor with parameters
-    : width(w)
-    , height(h)
-    , posX(posX)
-    , posY(posY)
-{
-    //initialize the block rectangle
-    blockRec.x = posX;
-    blockRec.y = posY;
-    blockRec.width = width;
-    blockRec.height = height;
+void Tile::Draw() const {
+    Rectangle destRec = { rect.x, rect.y, rect.width, rect.height };
 
-    //initialize the rectangle top
-    topRec.x = blockRec.x;
-    topRec.y = blockRec.y;
-    topRec.width = width;
-    topRec.height = 5;
+    if (solid) {
+        Rectangle sourceRec = { 0, 0, (int)texture.width, (int)texture.height };
+        Vector2 origin = { 0, 0 };
+        DrawTexturePro(texture, sourceRec, destRec, origin, 0.0f, WHITE);
+    }
 }
 
-//dimensions of the block getters
-int Block::getHeight() const
-{
-    return height;
+Rectangle Tile::getRect() const { 
+    return rect; 
 }
 
-int Block::getWidth() const
-{
-    return width;
+bool Tile::isSolid() const { 
+    return solid; 
 }
 
-int Block::getPosX() const
-{
-    return posX;
+void Tile::setTexture(Texture2D texture) {
+    this->texture = texture;
 }
 
-int Block::getPosY() const
-{
-    return posY;
+// Tilemap Class Implementations
+Tilemap::Tilemap(int rows, int cols, float tileSize)
+    : rows(rows), cols(cols), tileSize(tileSize) {
+    // Initialize the map with default non-solid tiles
+    for (int y = 0; y < rows; y++) {
+        vector<Tile> row;
+        for (int x = 0; x < cols; x++) {
+            row.emplace_back(x * tileSize, y * tileSize, tileSize, false, DARKGRAY);
+        }
+        tiles.push_back(row);
+    }
 }
 
-//get the rectangle of the block
-
-Rectangle Block::getRec()
-{
-    return blockRec;
+void Tilemap::setTile(int x, int y, bool solid, Color color) {
+    if (x >= 0 && x < cols && y >= 0 && y < rows) {
+        tiles[y][x] = Tile(x * tileSize, y * tileSize, tileSize, solid, color);
+    }
 }
 
-Rectangle Block::getTopRec()
-{
-    return topRec;
+void Tilemap::setTexture(Texture2D newTexture) {
+    texture = newTexture;
+    for (auto& row : tiles) {
+        for (auto& tile : row) {
+            if (tile.isSolid()){
+                tile.setTexture(texture);   //textura pra tiles solidos
+                } 
+        }
+    }
 }
 
-//setters
-void Block::setHeight(int h)
-{
-    height = h;
+void Tilemap::Draw() const {
+    for (const auto& row : tiles) {
+        for (const auto& tile : row) {
+            tile.Draw();
+        }
+    }
 }
 
-void Block::setWidth(int w)
-{
-    width = w;
+const Tile& Tilemap::getTileAt(float x, float y) const {
+    int col = static_cast<int>(std::round((x - tileSize / 2) / tileSize));  // Adjust for tile center
+    int row = static_cast<int>(std::round((y - tileSize / 2) / tileSize));  // Adjust for tile center
+
+    int mapWidth = cols * tileSize;
+    int mapHeight = rows * tileSize;
+
+    // Clamp col and row within bounds of the tile map
+    col = std::max(0, std::min(col, cols - 1));  // Clamp col to [0, cols - 1]
+    row = std::max(0, std::min(row, rows - 1));  // Clamp row to [0, rows - 1]
+
+    return tiles[row][col];
 }
 
-void Block::setPosX(int x)
-{
-    posX = x;
+
+float Tilemap::getTileSize() const { 
+    return tileSize; 
 }
 
-void Block::setPosY(int y)
-{
-    posY = y;
+bool Tilemap::checkCollision(const Rectangle& rect) const {
+    // Set the size of the collision check area around the player
+    int checkRadiusX = 2; // Check 2 tiles to the left and right
+    int checkRadiusY = 3; // Check 3 tiles below the player for ground detection
+    
+    // Calculate the range of columns and rows based on the player's rect
+    int startCol = std::max(0, static_cast<int>((rect.x) / tileSize) - checkRadiusX);
+    int endCol = std::min(cols - 1, static_cast<int>((rect.x + rect.width) / tileSize) + checkRadiusX);
+    int startRow = std::max(0, static_cast<int>((rect.y) / tileSize) - checkRadiusY);
+    int endRow = std::min(rows - 1, static_cast<int>((rect.y + rect.height) / tileSize) + checkRadiusY);
+
+    // Debug: Draw the collision check area
+    DrawRectangleLines(startCol * tileSize, startRow * tileSize, 
+                        (endCol - startCol + 1) * tileSize, 
+                        (endRow - startRow + 1) * tileSize, BLUE);
+
+    // Check for collision with tiles in the expanded collision box
+    for (int row = startRow; row <= endRow; ++row) {
+        for (int col = startCol; col <= endCol; ++col) {
+            const Tile& tile = tiles[row][col];
+
+            // Debug: Highlight tiles being checked (in Yellow)
+            float tileX = col * tileSize;
+            float tileY = row * tileSize;
+            DrawRectangleLines(tileX, tileY, tileSize, tileSize, YELLOW);
+
+            // Check if the tile is solid and if it collides with the player's rectangle
+            if (tile.isSolid() && CheckCollisionRecs(rect, tile.getRect())) {
+                return true; // Collision detected
+            }
+        }
+    }
+
+    return false; // No collision detected
 }
 
-void Block::Draw() const
-{
-    DrawRectangle(posX, posY, width, height, RED);
-    DrawRectangle(topRec.x, topRec.y, width, topRec.height, BLUE);
+int Tilemap::getRows() const { 
+    return rows; 
+}
+
+int Tilemap::getCols() const { 
+    return cols; 
 }

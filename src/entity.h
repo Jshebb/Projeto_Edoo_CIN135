@@ -1,38 +1,53 @@
-#ifndef BLOCK_H
-#define BLOCK_H
+#ifndef TILEMAP_H
+#define TILEMAP_H
 
-class Block{
-    public:
+#include <raylib.h>
+#include <vector>
+using namespace std;
 
-        Block(); //default constructor
+class Tile {
+private:
+    Rectangle rect;   // The tile's bounding box
+    bool solid;       // Whether the tile is solid (for collision)
+    Color color;      // The color to draw the tile (debug only)
+    Texture2D texture; // The texture to draw the tile
 
-        Block(int w, int h, int posX, int posY);    //constructor with parameters
+public:
+    Tile(float x, float y, float size, bool solid, Color color);
 
-        //dimensions of the block
-        void setWidth(int w);
-        void setHeight(int h);
-        int getWidth() const;
-        int getHeight() const;
+    void Draw() const;
 
-        //position of the block
-        void setPosX(int posX);
-        void setPosY(int posY);
-        int getPosX() const;
-        int getPosY() const;
+    void setTexture(Texture2D texture);
 
-        //draw the block
-        void Draw() const;
-
-        //get the rectangle of the block
-        Rectangle getRec();
-        Rectangle getTopRec();
-
-    private:
-        int width;
-        int height;
-        int posX;
-        int posY;
-        Rectangle blockRec;
-        Rectangle topRec;
+    Rectangle getRect() const;
+    bool isSolid() const;
 };
-#endif // BLOCK_H
+
+class Tilemap {
+private:
+    vector<vector<Tile>> tiles;
+    int rows, cols;
+    float tileSize;
+    Texture2D texture;
+
+public:
+    Tilemap(int rows, int cols, float tileSize);
+
+    void setTile(int x, int y, bool solid, Color color);
+
+    void setTexture(Texture2D newTexture);
+
+    void Draw() const;
+
+    const Tile& getTileAt(float x, float y) const;
+
+    float getTileSize() const;
+
+    bool checkCollision(const Rectangle& rect) const;
+
+    int getRows() const;
+
+    int getCols() const;
+};
+
+#endif // TILEMAP_H

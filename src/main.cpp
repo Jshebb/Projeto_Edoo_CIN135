@@ -7,15 +7,34 @@ int main()
 {
     const Color Black = {0, 0, 0, 255};
     
-    constexpr int screenWidth = 800;
-    constexpr int screenHeight = 600;
+    constexpr int screenWidth = 1280;
+    constexpr int screenHeight = 720;
     
     Player player;
-    Block block(800, 50, 0, 550);
-    Block block2(600, 50, 200, 400);
+    Tilemap tilemap(100, 100, 32.0f);
+    tilemap.setTile(0, 10, true, RED);
+    tilemap.setTile(0, 9, true, RED); // Add a single solid tile for testing
+    tilemap.setTile(1, 10, true, RED);
+    tilemap.setTile(2, 10, true, RED);
+    tilemap.setTile(3, 10, true, RED);
+    tilemap.setTile(4, 10, true, RED);
+    tilemap.setTile(4, 10, true, RED);
+    tilemap.setTile(4, 10, true, RED);
+    tilemap.setTile(4, 7, true, RED);
+    tilemap.setTile(5, 8, true, RED);
+    tilemap.setTile(6, 8, true, RED);
+    tilemap.setTile(7, 9, true, RED);
+    
+    
+    Block block(1000, 50, 0, 550);
+    Block block2(400, 50, 200, 400);
     
     InitWindow(screenWidth, screenHeight, "My first RAYLIB program!");
     SetTargetFPS(60);
+
+    // Initialize the player sprite
+    player.setSprite(LoadTexture("sprites/image.png"));
+    tilemap.setTexture(LoadTexture("sprites/stone.jpg"));
 
     while (!WindowShouldClose())
     {
@@ -62,4 +81,5 @@ int main()
     }
     
     CloseWindow();
+    return 0;
 }

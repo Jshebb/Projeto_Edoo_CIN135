@@ -11,9 +11,10 @@ private:
     bool solid;       // Whether the tile is solid (for collision)
     Color color;      // The color to draw the tile (debug only)
     Texture2D texture; // The texture to draw the tile
+    int id;    // The tile's ID
 
 public:
-    Tile(float x, float y, float size, bool solid, Color color);
+    Tile(float x, float y, float size, bool solid, Color color, int id = 0);
 
     void Draw() const;
 
@@ -21,6 +22,9 @@ public:
 
     Rectangle getRect() const;
     bool isSolid() const;
+    void SetID(int ID);
+    void SetSolid(bool solid);
+    int getID();
 };
 
 class Tilemap {
@@ -33,9 +37,9 @@ private:
 public:
     Tilemap(int rows, int cols, float tileSize);
 
-    void setTile(int x, int y, bool solid, Color color);
+    void setTile(int x, int y, bool solid, Color color, int id);
 
-    void setTexture(Texture2D newTexture);
+    void setTexture(Texture2D grassTexture, Texture2D dirtTexture, Texture2D stoneTexture);
 
     void Draw() const;
 
@@ -48,6 +52,10 @@ public:
     int getRows() const;
 
     int getCols() const;
+
+    void generateWorld();
+
+    void generateCaves(int iterations, int seed);
 };
 
 #endif // TILEMAP_H

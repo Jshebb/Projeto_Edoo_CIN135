@@ -8,8 +8,8 @@
 
 
 // Constructor
-Player::Player()
-    : position({ 0, 20 }),
+Player::Player(Tilemap tilemap)
+    : position({ 300, 20 }),
       speed({ 0, 0 }),
       width(32),
       height(64),
@@ -20,6 +20,27 @@ Player::Player()
       playerSprite()
                         {
     updateRectangles();
+
+    // Inicializar a câmera by LM
+    camera.target = { position.x + width / 2, position.y + height / 2 };
+    camera.offset = { GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f }; 
+    camera.zoom = 1.0f;
+    camera.rotation = 0.0f;
+
+    Vector2 worldSize = { tilemap.getCols() * tilemap.getTileSize(), tilemap.getRows() * tilemap.getTileSize() };
+
+    // Atualizar a câmera para seguir o jogador by LM
+    camera.target = { position.x + width / 2, position.y + height / 2 };
+
+    // Limitar a câmera às bordas do mundo by LM
+    if (camera.target.x < GetScreenWidth() / 2.0f)
+        camera.target.x = GetScreenWidth() / 2.0f;
+    if (camera.target.y < GetScreenHeight() / 2.0f)
+        camera.target.y = GetScreenHeight() / 2.0f;
+    if (camera.target.x > worldSize.x - GetScreenWidth() / 2.0f)
+        camera.target.x = worldSize.x - GetScreenWidth() / 2.0f;
+    if (camera.target.y > worldSize.y - GetScreenHeight() / 2.0f)
+        camera.target.y = worldSize.y - GetScreenHeight() / 2.0f;
 }
 
 // Updates the player's rectangles (bounds)
@@ -47,16 +68,31 @@ void Player::Update(const Tilemap& tilemap) {
     // Apply gravity
     speed.y = fmin(speed.y + gravity, maxSpeed);
     
-    // Horizontal collision
+    // Horizontal movement and stair climbing
     position.x += speed.x;
     updateRectangles();
     if (tilemap.checkCollision(playerRec)) {
-        position.x -= speed.x;
-        speed.x = 0;
-        updateRectangles();
+        // Check for a "stair" in front of the player
+        Rectangle stepCheck = {
+            playerRec.x, 
+            playerRec.y - playerRec.height / 2, // Check slightly above the player
+            playerRec.width, 
+            playerRec.height
+        };
+
+        if (!tilemap.checkCollision(stepCheck)) {
+            // Climb the step
+            position.y -= 32; // Adjust the height to climb the step
+            updateRectangles();
+        } else {
+            // Reset position if unable to climb
+            position.x -= speed.x;
+            speed.x = 0;
+            updateRectangles();
+        }
     }
 
-    // Vertical collision
+    // Vertical movement and collision
     position.y += speed.y;
     updateRectangles();
     if (tilemap.checkCollision(playerRec)) {
@@ -67,6 +103,34 @@ void Player::Update(const Tilemap& tilemap) {
     } else {
         grounded = false;
     }
+
+    // Smoothly update camera to follow the player
+    float cameraSmoothness = 0.1f; // Lower values for slower, smoother movement
+
+    // Desired camera target (centered on the player)
+    Vector2 desiredTarget = { position.x + width / 2, position.y + height / 2 };
+
+    // Interpolate camera target to smooth out movement
+    camera.target.x += (desiredTarget.x - camera.target.x) * cameraSmoothness;
+    camera.target.y += (desiredTarget.y - camera.target.y) * cameraSmoothness;
+
+    // Offset remains centered on the screen
+    camera.offset = { GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
+
+    // Limit the camera to the edges of the world
+    Vector2 worldSize = { tilemap.getCols() * tilemap.getTileSize(), tilemap.getRows() * tilemap.getTileSize() };
+
+    float halfScreenWidth = GetScreenWidth() / 2.0f;
+    float halfScreenHeight = GetScreenHeight() / 2.0f;
+
+    if (camera.target.x < halfScreenWidth)
+        camera.target.x = halfScreenWidth;
+    if (camera.target.y < halfScreenHeight)
+        camera.target.y = halfScreenHeight;
+    if (camera.target.x > worldSize.x - halfScreenWidth)
+        camera.target.x = worldSize.x - halfScreenWidth;
+    if (camera.target.y > worldSize.y - halfScreenHeight)
+        camera.target.y = worldSize.y - halfScreenHeight;
 }
 
 
@@ -94,4 +158,10 @@ void Player::setSprite(Texture2D sprite) { playerSprite = sprite; }
 
 Rectangle Player::getRec() const {
     return playerRec;
+}
+
+// by LM
+Camera2D Player::getCamera() const
+{
+    return camera;
 }

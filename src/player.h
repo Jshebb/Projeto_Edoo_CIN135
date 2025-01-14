@@ -16,11 +16,13 @@ private:
     Rectangle playerRec;       // Rectangle representing the player's bounds
     Rectangle belowRec;        // Rectangle below the player for ground collision
     Texture2D playerSprite;    // Player sprite     
+    Camera2D camera;           // Camera
+    
 
     void updateRectangles();   // Updates `playerRec` and `belowRec`
 
 public:
-    Player();                  // Constructor
+    Player(Tilemap tilemap);                  // Constructor
 
     void Update(const Tilemap& tilemap);  // Updates player movement and collisions
     void Draw() const;                    // Draws the player on the screen
@@ -30,11 +32,13 @@ public:
     Vector2 getSpeed() const;
     Rectangle getRec() const;
     bool isGrounded() const;
+    Camera2D getCamera() const; // obter a câmera
 
     // Setters
     void setPosition(Vector2 newPosition);
     void setSpeed(Vector2 newSpeed);
     void setSprite(Texture2D sprite);
+
 
 };
 

@@ -11,7 +11,14 @@ Player::Player()
     , height(50)
     , friction(1)
     , grounded (false)
+    , worldSize({2000, 2000}) // Definindo o tamanho do mundo (2000x2000) by LM
 {
+    // Inicializar a câmera by LM
+    camera.target = (Vector2){ posX + width / 2, posY + height / 2 };
+    camera.offset = (Vector2){ 400.0f, 300.0f }; // Centro da tela
+    camera.zoom = 1.0f;
+    camera.rotation = 0.0f;
+
     //initialize the player rectangle
     playerRec.x = posX;
     playerRec.y = posY;
@@ -87,7 +94,24 @@ void Player::Update()
     belowRec.x = posX;
     belowRec.y = posY + height;
 
+    // Atualizar a câmera para seguir o jogador by LM
+    camera.target = (Vector2){ posX + width / 2, posY + height / 2 };
 
+    // Limitar a câmera às bordas do mundo by LM
+    if (camera.target.x < GetScreenWidth() / 2.0f)
+        camera.target.x = GetScreenWidth() / 2.0f;
+    if (camera.target.y < GetScreenHeight() / 2.0f)
+        camera.target.y = GetScreenHeight() / 2.0f;
+    if (camera.target.x > worldSize.x - GetScreenWidth() / 2.0f)
+        camera.target.x = worldSize.x - GetScreenWidth() / 2.0f;
+    if (camera.target.y > worldSize.y - GetScreenHeight() / 2.0f)
+        camera.target.y = worldSize.y - GetScreenHeight() / 2.0f;
+
+}
+// by LM
+Camera2D Player::getCamera() const
+{
+    return camera;
 }
 
 void Player::Draw() const

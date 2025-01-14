@@ -25,6 +25,8 @@ public:
     void setHeight(int h);
     void setWidth(int w);
     void setGrounded(bool ground);
+    
+    Camera2D getCamera() const; // obter a câmera
 
 private:
     int posX;
@@ -39,4 +41,7 @@ private:
     Rectangle playerRec;
     Rectangle belowRec;
     int static const gravity = 1;
+
+    Camera2D camera;       // Câmera que segue o jogador LM
+    Vector2 worldSize;     // Dimensão total do mundo LM
 };

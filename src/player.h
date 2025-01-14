@@ -1,47 +1,41 @@
-#pragma once
+#ifndef PLAYER_H
+#define PLAYER_H
+
 #include <raylib.h>
+#include "entity.h"
 
-class Player
-{
-public:
-    Player();
-    void Update();
-    void Draw() const;
-
-    int getSpeedX() const;
-    int getSpeedY() const;
-    int getPosX() const;
-    int getPosY() const;
-    int getHeight() const;
-    int getWidth() const;
-    bool getGrounded() const;
-    Rectangle getRec();
-    Rectangle getBelowRec();
-
-    void setPosX(int x);
-    void setPosY(int y);
-    void setSpeedX(int x);
-    void setSpeedY(int y);
-    void setHeight(int h);
-    void setWidth(int w);
-    void setGrounded(bool ground);
-    
-    Camera2D getCamera() const; // obter a câmera
-
+class Player {
 private:
-    int posX;
-    int posY;
-    int width;
-    int height;
-    int speedX;
-    float speedY;
-    int maxSpeed;
-    int friction;
-    bool grounded;
-    Rectangle playerRec;
-    Rectangle belowRec;
-    int static const gravity = 1;
+    Vector2 position;          // Player position
+    Vector2 speed;             // Player speed
+    int width, height;         // Dimensions of the player
+    float maxSpeed;            // Maximum speed
+    float gravity;             // Gravity strength
+    float friction;            // Horizontal friction
+    bool grounded;             // Whether the player is on the ground
+    Rectangle playerRec;       // Rectangle representing the player's bounds
+    Rectangle belowRec;        // Rectangle below the player for ground collision
+    Texture2D playerSprite;    // Player sprite     
 
-    Camera2D camera;       // Câmera que segue o jogador LM
-    Vector2 worldSize;     // Dimensão total do mundo LM
+    void updateRectangles();   // Updates `playerRec` and `belowRec`
+
+public:
+    Player();                  // Constructor
+
+    void Update(const Tilemap& tilemap);  // Updates player movement and collisions
+    void Draw() const;                    // Draws the player on the screen
+
+    // Getters
+    Vector2 getPosition() const;
+    Vector2 getSpeed() const;
+    Rectangle getRec() const;
+    bool isGrounded() const;
+
+    // Setters
+    void setPosition(Vector2 newPosition);
+    void setSpeed(Vector2 newSpeed);
+    void setSprite(Texture2D sprite);
+
 };
+
+#endif // PLAYER_H

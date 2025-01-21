@@ -2,7 +2,7 @@
 #define PLAYER_H
 
 #include <raylib.h>
-#include "entity.h"
+#include "tilemap.h"
 
 class Player {
 private:
@@ -16,27 +16,32 @@ private:
     Rectangle playerRec;       // Rectangle representing the player's bounds
     Rectangle belowRec;        // Rectangle below the player for ground collision
     Texture2D playerSprite;    // Player sprite     
-    Camera2D camera;           // Camera
-    
+    Camera2D camera;           // Camera    
+
     void updateRectangles();   // Updates `playerRec` and `belowRec`
 
 public:
-    Player(Tilemap tilemap); // Constructor
+    Player();                  // Constructor
 
-    void Update(Tilemap& tilemap, vector<Texture2D>& inventory); // Atualiza o jogador e coleta drops
-    void Draw() const; // Desenha o jogador na tela
+    void Update(const Tilemap& tilemap);  // Updates player movement and collisions
+    void Draw() const;                    // Draws the player on the screen
 
     // Getters
-    Vector2 getPosition() const; // Retorna a posição do jogador
-    Vector2 getSpeed() const;    // Retorna a velocidade do jogador
-    Rectangle getRec() const;    // Retorna o retângulo do jogador
-    bool isGrounded() const;     // Retorna se o jogador está no chão
-    Camera2D getCamera() const;  // Retorna a câmera associada ao jogador
+    Vector2 getPosition() const;
+    Vector2 getSpeed() const;
+    Rectangle getRec() const;
+    bool isGrounded() const;
+    Camera2D getCamera() const; // obter a câmera
+    int getHeight();
 
     // Setters
-    void setPosition(Vector2 newPosition); // Define a posição do jogador
-    void setSpeed(Vector2 newSpeed);       // Define a velocidade do jogador
-    void setSprite(Texture2D sprite);      // Define o sprite do jogador
+    void setPosition(Vector2 newPosition);
+    void setSpeed(Vector2 newSpeed);
+    void setSprite(Texture2D sprite);
+
+    void initializeCamera(Tilemap tilemap);
+
+
 };
 
 #endif // PLAYER_H

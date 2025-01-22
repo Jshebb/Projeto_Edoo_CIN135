@@ -3,6 +3,7 @@
 
 #include <raylib.h>
 #include "tilemap.h"
+#include "inventory.h"
 
 class Player {
 private:
@@ -17,6 +18,8 @@ private:
     Rectangle belowRec;        // Rectangle below the player for ground collision
     Texture2D playerSprite;    // Player sprite     
     Camera2D camera;           // Camera    
+ 
+
 
     void updateRectangles();   // Updates `playerRec` and `belowRec`
 

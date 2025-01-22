@@ -208,12 +208,21 @@ void Tilemap::generateWorld() {
                 id = 5; // Bedrock
             }
             else {
-                // Generate cave noise (but only above the bedrock)
+                    // Generate cave noise (but only above the bedrock)
                 float noiseValue = caveNoise(x, y, simplex, caveFrequency, caveThreshold);
 
                 if (y >= columnHeight && noiseValue == 1.0f && y < rows - 1) {
-                    // Create cave space (air) if noise value indicates a cave and not at the bottom row
-                    id = 4; // Air (cave space)
+                    // Check if the cave is within the dirt or grass layers
+                    if (y == columnHeight) {
+                        // Grass layer becomes id 6 if a cave is present
+                        id = 6;
+                    } else if (y > columnHeight && y <= columnHeight + 3) {
+                        // Dirt layer becomes id 6 if a cave is present
+                        id = 6;
+                    } else {
+                        // Create cave space (air) if not in grass or dirt layers
+                        id = 4; // Air (cave space)
+                    }
                 } else if (y < columnHeight) {
                     // Above the terrain (air)
                     id = 0;
@@ -293,9 +302,10 @@ void Tilemap::TilePlacement(const Camera2D& camera, int tileSize, Vector2 Player
                 DrawRectangleRec(highlightRect, (Color){ 255, 255, 255, 32 });
             }
 
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && tiles[mouseTileY][mouseTileX].isSolid() && tiles[mouseTileY][mouseTileX].getID() != 4){
+
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && tiles[mouseTileY][mouseTileX].isSolid() && tiles[mouseTileY][mouseTileX].getID() != 4 &&
+            tiles[mouseTileY][mouseTileX].getID() != 5 ){
                 Tile dropTile = getTileAt(worldMousePos.x, worldMousePos.y);
-                setTile(mouseTileX, mouseTileY, false, BLACK, 0);
 
                 // Calculate the source rectangle for the drop sprite based on the tile ID
                 Rectangle sourceRect = {
@@ -316,6 +326,23 @@ void Tilemap::TilePlacement(const Camera2D& camera, int tileSize, Vector2 Player
                     Item drop("stone", 3, 1, {mouseTileX * tileSize, mouseTileY * tileSize}, SpriteSheetDrops, {mouseTileX * tileSize, mouseTileY * tileSize});
                     dropManager.addDrop(drop);
                 }
+            
+
+            if (dropTile.getID() == 3) {
+                // Replace the broken tile with an id == 4 tile
+                setTile(mouseTileX, mouseTileY, false, DARKGRAY, 4); // Example replacement color and ID
+                tiles[mouseTileY][mouseTileX].setTexture(SpriteSheetBlocks);
+                
+            } 
+            else if (dropTile.getID() == 2){
+                // Replace the broken tile with an id == 6 tile
+                setTile(mouseTileX, mouseTileY, false, DARKGRAY, 6);
+                tiles[mouseTileY][mouseTileX].setTexture(SpriteSheetBlocks);
+            }
+            else {
+                    // Remove the tile for other IDs
+                    setTile(mouseTileX, mouseTileY, false, BLACK, 0);
+                }
             }
             if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) && !tiles[mouseTileY][mouseTileX].isSolid()) {
                 // Check if the placement position overlaps with the player's position
@@ -323,7 +350,7 @@ void Tilemap::TilePlacement(const Camera2D& camera, int tileSize, Vector2 Player
                 Rectangle tileRect = { static_cast<float>(mouseTileX * tileSize), static_cast<float>(mouseTileY * tileSize), static_cast<float>(tileSize), static_cast<float>(tileSize) };
 
                 if (!CheckCollisionRecs(playerRect, tileRect)) {
-                    setTile(mouseTileX, mouseTileY, true, GREEN, 2); 
+                    setTile(mouseTileX, mouseTileY, true, GREEN, 5); 
                     tiles[mouseTileY][mouseTileX].setTexture(SpriteSheetBlocks);
                 }
             }
@@ -333,15 +360,18 @@ void Tilemap::TilePlacement(const Camera2D& camera, int tileSize, Vector2 Player
     }
 }
 
-// Function to find the ground level (first solid tile) for the player's X position
+// Function to find the ground level (highest solid tile, corresponding to smallest Y) for the player's X position
 int Tilemap::getGroundLevel(int x) {
+    // Convert the X position to the column index in the tile array
+    int column = x / tileSize; 
+
     // Start from the top of the map and move downward
     for (int y = 0; y < rows; ++y) {
-        if (tiles[y][x].isSolid()) {
-            return (y * 32);  // Return the Y position of the first solid tile
+        if (tiles[y][column].isSolid()) {
+            return ((y * tileSize) - 64);  // Return the Y position of the first solid tile found
         }
     }
-    return -1;
+    return -1; // Return -1 if no solid tile is found
 }
 
 DropManager Tilemap::getDropManager(){

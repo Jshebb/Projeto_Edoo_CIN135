@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "tilemap.h"
+#include "inventory.h"
 #include <raylib.h>
 #include <vector>
 #include <cmath>
@@ -17,7 +18,8 @@ Player::Player()
       friction(1.0f),
       grounded(true),
       playerSprite({0})
-                        {
+
+{
     updateRectangles();
 }
 

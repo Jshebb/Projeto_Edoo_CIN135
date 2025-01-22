@@ -35,4 +35,17 @@ private:
     int maxDrops;
 };
 
+class Inventory {
+    public:
+    Inventory(int maxSlots);
+    void addItem(const Item& item);
+    void removeItem(const Item& item);
+    void updateItem(const Item& item);
+    void renderItems();
+
+    private:
+    std::vector<Item> items;
+    int maxSlots;
+};
+
 #endif // INVENTORY_H

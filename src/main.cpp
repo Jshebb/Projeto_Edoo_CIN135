@@ -60,13 +60,15 @@ int main()
     Texture2D DropsSheet;
     Texture2D playerSprite;
     Texture2D BackGround;
-    Texture2D Inventory;
+    Texture2D InventorySprite;
     Texture2D clouds;
 
     Tilemap* tilemap = nullptr; // Pointer for the Tilemap instance
-    DropManager dropManager(30);
     Player player;
+    Inventory inventory(770, 22);
+    DropManager dropManager(30);
 
+ 
 while (loading && !WindowShouldClose()) {
     BeginDrawing();
     ClearBackground(BLACK);
@@ -98,7 +100,7 @@ while (loading && !WindowShouldClose()) {
 
     // Perform loading tasks step by step
     if (progress == 0) {
-        tilemap = new Tilemap(500, 100000, 32.0f, dropManager); // Initialize the Tilemap
+        tilemap = new Tilemap(20, 10000, 32.0f, dropManager, inventory); // Initialize the Tilemap
     } else if (progress == 1) {
         tilemap->generateWorld(); // Simulate a heavy task
         WaitTime(0.5);
@@ -113,7 +115,7 @@ while (loading && !WindowShouldClose()) {
         BackGround = LoadTexture("sprites/basesemnuvens.png");
         clouds = LoadTexture("sprites/nuvensfrente.png");
     } else if (progress == 6) {
-        Inventory = LoadTexture("sprites/inventario.png");
+        InventorySprite = LoadTexture("sprites/inventario.png");
         tilemap->setTexture(BlocksSheet); // Link textures to the tilemap
         loading = false; // Finish loading
     }
@@ -125,10 +127,14 @@ while (loading && !WindowShouldClose()) {
     int x = (10000 / 2) - 32;
     int y = 0;
     Vector2 playerPos = {x, 0};
+    dropManager = tilemap->getDropManager();
     playerPos.y = tilemap->getGroundLevel(x);
     player.setPosition(playerPos);
     player.initializeCamera(*tilemap);
-    dropManager = tilemap->getDropManager();
+    
+    
+    
+
 
     while (!WindowShouldClose())
     {
@@ -145,8 +151,13 @@ while (loading && !WindowShouldClose()) {
             player.Draw();
             tilemap->TilePlacement(player.getCamera(), tilemap->getTileSize(), player.getPosition(), DropsSheet, BlocksSheet);
         EndMode2D();
+        tilemap->UpdateInventory();
+        tilemap->DrawInventory();
 
-        DrawTexture(Inventory, 764, -50, WHITE);
+   
+
+        
+        
 
         Vector2 playerPosition = player.getPosition(); 
         Vector2 playerSpeed = player.getSpeed();        

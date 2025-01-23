@@ -35,10 +35,11 @@ private:
     float tileSize;
     Texture2D texture;
     DropManager dropManager;
+    Inventory inventory;
     
 
 public:
-    Tilemap(int rows, int cols, float tileSize, DropManager dropManager);
+    Tilemap(int rows, int cols, float tileSize, DropManager dropManager, Inventory inventory);
 
     void setTile(int x, int y, bool solid, Color color, int id);
 
@@ -64,7 +65,11 @@ public:
 
     int getGroundLevel(int x);
 
-    DropManager getDropManager();
+    DropManager& getDropManager();
+
+    void DrawInventory();
+
+    void UpdateInventory();
 };
 
 #endif // TILEMAP_H

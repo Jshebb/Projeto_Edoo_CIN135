@@ -64,8 +64,8 @@ void Tile::SetSolid(bool solid) {
 
 
 // Tilemap Class Implementations
-Tilemap::Tilemap(int rows, int cols, float tileSize, DropManager dropManager)
-    : rows(rows), cols(cols), tileSize(tileSize), dropManager(dropManager)
+Tilemap::Tilemap(int rows, int cols, float tileSize, DropManager dropManager, Inventory inventory)
+    : rows(rows), cols(cols), tileSize(tileSize), dropManager(dropManager), inventory(inventory)
     {
     // Initialize the map with default non-solid tiles
     for (int y = 0; y < rows; y++) {
@@ -356,7 +356,7 @@ void Tilemap::TilePlacement(const Camera2D& camera, int tileSize, Vector2 Player
             }
         }
         dropManager.drawDrops();
-        dropManager.updateDrops(PlayerPos, 300.0f);
+        dropManager.updateDrops(PlayerPos, 300.0f, inventory);
     }
 }
 
@@ -374,6 +374,16 @@ int Tilemap::getGroundLevel(int x) {
     return -1; // Return -1 if no solid tile is found
 }
 
-DropManager Tilemap::getDropManager(){
+DropManager& Tilemap::getDropManager(){
     return dropManager;
+}
+
+void Tilemap::DrawInventory(){
+    // Draw the inventory
+    inventory.Draw();
+}
+
+void Tilemap::UpdateInventory(){
+    // Update the inventory
+    inventory.Update();
 }

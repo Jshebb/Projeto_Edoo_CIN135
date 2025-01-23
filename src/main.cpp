@@ -16,7 +16,7 @@ int main()
     bool showMenu = true;
 
     // Carregar a imagem do menu
-    Texture2D menuBackground = LoadTexture("sprites/menufoto.png");
+    Texture2D menuBackground = LoadTexture("sprites/menupixel.png");
     //botões invisíveis
     Rectangle startButton = { screenWidth / 2 - 188, screenHeight / 2 + 34, 377, 61 };
     Rectangle exitButton = { screenWidth / 2 - 188, screenHeight / 2 + 140, 377, 61 };
@@ -67,11 +67,16 @@ int main()
     Player player;
     Inventory inventory(770, 22);
     DropManager dropManager(30);
+    Player player;
 
- 
+    Texture2D loadingBackground = LoadTexture("sprites/loadingdesfocado.png");
+
 while (loading && !WindowShouldClose()) {
     BeginDrawing();
     ClearBackground(BLACK);
+    
+    // Desenhar a imagem de fundo
+    DrawTexture(loadingBackground, 0, 0, WHITE);
 
     // Draw loading text and progress bar
     DrawText("Loading...", screenWidth / 2 - MeasureText("Loading...", 40) / 2, screenHeight / 2 - 50, 40, WHITE);

@@ -15,8 +15,11 @@ int main()
 
     bool showMenu = true;
 
-    Rectangle startButton = { screenWidth / 2 - 100, screenHeight / 2, 200, 50 };
-    Rectangle exitButton = { screenWidth / 2 - 100, screenHeight / 2 + 70, 200, 50 };
+    // Carregar a imagem do menu
+    Texture2D menuBackground = LoadTexture("sprites/menufoto.png");
+    //botões invisíveis
+    Rectangle startButton = { screenWidth / 2 - 188, screenHeight / 2 + 34, 377, 61 };
+    Rectangle exitButton = { screenWidth / 2 - 188, screenHeight / 2 + 140, 377, 61 };
 
     while (showMenu && !WindowShouldClose()) {
         Vector2 mousePoint = GetMousePosition();
@@ -34,13 +37,16 @@ int main()
         BeginDrawing();
         ClearBackground(BLACK);
 
-        DrawText("Main Menu", screenWidth / 2 - MeasureText("Main Menu", 40) / 2, screenHeight / 2 - 100, 40, WHITE);
+        // Desenhar a imagem do menu
+        DrawTexture(menuBackground, 0, 0, WHITE);
 
-        DrawRectangleRec(startButton, startButtonHovered ? GRAY : DARKGRAY);
-        DrawText("Start", startButton.x + startButton.width / 2 - MeasureText("Start", 20) / 2, startButton.y + 15, 20, WHITE);
-
-        DrawRectangleRec(exitButton, exitButtonHovered ? GRAY : DARKGRAY);
-        DrawText("Exit", exitButton.x + exitButton.width / 2 - MeasureText("Exit", 20) / 2, exitButton.y + 15, 20, WHITE);
+        // Botões invisíveis (para depuração, as bordas podem ser desenhadas)
+        if (startButtonHovered) {
+            DrawRectangleLinesEx(startButton, 2, GREEN); // Borda vermelha para depuração
+        }
+        if (exitButtonHovered) {
+            DrawRectangleLinesEx(exitButton, 2, GREEN); // Borda vermelha para depuração
+        }
 
         EndDrawing();
     }

@@ -62,14 +62,14 @@ int main()
     Texture2D BackGround;
     Texture2D InventorySprite;
     Texture2D clouds;
+    Texture2D loadingBackground = LoadTexture("sprites/loadingdesfocado.png");
+    Texture2D InventoryTile = LoadTexture("sprites/InventoryTile.png");
 
     Tilemap* tilemap = nullptr; // Pointer for the Tilemap instance
     Player player;
-    Inventory inventory(770, 22);
+    Inventory inventory(770, 22, InventoryTile);
     DropManager dropManager(30);
-    Player player;
-
-    Texture2D loadingBackground = LoadTexture("sprites/loadingdesfocado.png");
+    
 
 while (loading && !WindowShouldClose()) {
     BeginDrawing();

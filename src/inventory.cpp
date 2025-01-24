@@ -38,7 +38,8 @@ void Inventory::initializeSlotRects(float x, float y, float slotSize, float padd
     }
 }
 
-Inventory::Inventory( float x, float y, float slotSize, float padding)
+Inventory::Inventory( float x, float y,  Texture2D& sprite, float slotSize, float padding):
+sprite(sprite)
 {
     items.resize(maxSlots);
     initializeSlotRects(x, y, slotSize, padding);
@@ -83,44 +84,76 @@ void Inventory::Update() {
 }
 
 void Inventory::Draw() {
-    // Draw slot backgrounds
+    // Draw slot backgrounds using the inventorySprite
     for (int i = 0; i < maxSlots; i++) {
-        // Highlight selected slot
-        Color slotColor = (i == selectedIndex) 
-            ? LIGHTGRAY 
-            : DARKGRAY;
-        DrawRectangleRec(slotRects[i], slotColor);
-        std::cout << "Id " << items[i].id << std::endl;
+        // Calculate source rectangle for slot background sprite
+        Rectangle slotSourceRect = { 0.0f, 0.0f, 64.0f, 64.0f }; // Slot sprite size (64x64)
         
+        // Determine destination rectangle for slot background
+        Rectangle slotDestRect = {
+            slotRects[i].x,         // X position
+            slotRects[i].y,         // Y position
+            64.0f,                  // Width of the slot
+            64.0f                   // Height of the slot
+        };
+
+        // Highlight selected slot by modifying the tint
+        Color slotTint = (i == selectedIndex) 
+            ? YELLOW
+            : WHITE;
+
+        // Draw the slot sprite
+        DrawTexturePro(
+            sprite,            // Texture for slot background
+            slotSourceRect,    // Source rectangle
+            slotDestRect,      // Destination rectangle
+            { 0.0f, 0.0f },    // Origin (top-left corner)
+            0.0f,              // Rotation
+            slotTint           // Tint color
+        );
+
+        std::cout << "Id " << items[i].id << std::endl;
+
         // Draw item if it exists
         if (items[i].id > 0) {
-            // Calculate the source rectangle based on the item's ID
-            Rectangle sourceRect = {
+            // Calculate the source rectangle based on the item's ID (32x32 spritesheet)
+            Rectangle itemSourceRect = {
                 static_cast<float>((items[i].id - 1) * 32), // X position in the spritesheet (32px per tile)
                 0.0f,                                       // Y position in the spritesheet (row 0)
-                32.0f,                                      // Width of each tile
-                32.0f                                       // Height of each tile
+                32.0f,                                      // Width of the item sprite
+                32.0f                                       // Height of the item sprite
             };
 
-            // Draw the item's sprite
-            DrawTextureRec(
-                items[i].dropSprite, // Texture (spritesheet)
-                sourceRect,          // Source rectangle
-                {slotRects[i].x, slotRects[i].y}, // Destination position
-                WHITE                            // Tint color
+            // Define the destination rectangle to scale the item to 64x64
+            Rectangle itemDestRect = {
+                slotRects[i].x,       // X position in the slot
+                slotRects[i].y,       // Y position in the slot
+                64.0f,                // Stretch width to 64px
+                64.0f                 // Stretch height to 64px
+            };
+
+            // Draw the item's sprite stretched to 64x64
+            DrawTexturePro(
+                items[i].dropSprite,  // Texture (spritesheet)
+                itemSourceRect,       // Source rectangle
+                itemDestRect,         // Destination rectangle (scaled to 64x64)
+                { 0.0f, 0.0f },       // Origin (top-left corner)
+                0.0f,                 // Rotation
+                WHITE                 // Tint color
             );
 
             // Draw the item's quantity
             DrawText(
                 TextFormat("x%d", items[i].quantity), 
-                slotRects[i].x + 5, 
-                slotRects[i].y + 50, 
+                slotRects[i].x + 10, 
+                slotRects[i].y + 40, 
                 20, 
-                BLACK
+                WHITE
             );
         }
     }
 }
+
 // Adds a drop item to the manager
 void DropManager::addDrop(const Item& item) {
     if (drops.size() >= maxDrops) {

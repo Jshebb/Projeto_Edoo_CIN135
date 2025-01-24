@@ -22,7 +22,7 @@ public:
 
 class Inventory {
     public:
-    Inventory(float x, float y, float slotSize = 48.0f, float padding = 20.0f);
+    Inventory(float x, float y, Texture2D& sprite ,float slotSize = 48.0f, float padding = 10.0f);
     bool addItem(const Item& item);
     void removeItem(int slotIndex);
     void Update();
@@ -33,6 +33,7 @@ class Inventory {
     static const int maxSlots = 8;
     Rectangle slotRects[maxSlots];
     int selectedIndex = -1;
+    Texture2D sprite;
 
     void initializeSlotRects(float x, float y, float slotSize, float padding);
 };

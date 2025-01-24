@@ -14,6 +14,8 @@ int main()
     SetTargetFPS(60);
 
     bool showMenu = true;
+    bool chooseMapSize = false; // LM Controle de escolha do tamanho do mapa
+    int mapSize = 0;           // LM Tamanho do mapa (0 = não escolhido, 1 = pequeno, 2 = médio, 3 = grande)
 
     // Carregar a imagem do menu
     Texture2D menuBackground = LoadTexture("sprites/menupixel.png");
@@ -28,6 +30,7 @@ int main()
 
         if (startButtonHovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             showMenu = false;
+            chooseMapSize = true; // LM tela de escolha do tamanho do mapa
         }
         if (exitButtonHovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             CloseWindow();
@@ -50,6 +53,56 @@ int main()
 
         EndDrawing();
     }
+
+    // imagem de fundo para a tela de escolha do mapa
+    Texture2D chooseMapBackground = LoadTexture("sprites/choosemap.png");
+
+    // Tela para escolher o tamanho do mapa
+    Rectangle smallMapButton = { screenWidth / 2 - 188, screenHeight / 2 + 34, 377, 61 };
+    Rectangle mediumMapButton = { screenWidth / 2 - 188, screenHeight / 2 + 140, 377, 61 };
+    Rectangle largeMapButton = { screenWidth / 2 - 188, screenHeight / 2 + 244, 377, 61 };
+
+    while (chooseMapSize && !WindowShouldClose()) {
+        Vector2 mousePoint = GetMousePosition();
+        bool smallButtonHovered = CheckCollisionPointRec(mousePoint, smallMapButton);
+        bool mediumButtonHovered = CheckCollisionPointRec(mousePoint, mediumMapButton);
+        bool largeButtonHovered = CheckCollisionPointRec(mousePoint, largeMapButton);
+
+        if (smallButtonHovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            mapSize = 1; // mapa pequeno
+            chooseMapSize = false;
+        }
+        if (mediumButtonHovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            mapSize = 2; // mapa médio
+            chooseMapSize = false;
+        }
+        if (largeButtonHovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            mapSize = 3; // mapa grande
+            chooseMapSize = false;
+        }
+
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        // imagem de fundo do menu de escolha do mapa
+        DrawTexture(chooseMapBackground, 0, 0, WHITE);
+
+        // Botões invisíveis com borda verde ao passar o mouse
+        if (smallButtonHovered) {
+            DrawRectangleLinesEx(smallMapButton, 2, GREEN);
+        }
+        if (mediumButtonHovered) {
+            DrawRectangleLinesEx(mediumMapButton, 2, GREEN);
+        }
+        if (largeButtonHovered) {
+            DrawRectangleLinesEx(largeMapButton, 2, GREEN);
+        }
+
+        EndDrawing();
+    }
+
+    // Após terminar o uso, libere a textura
+    UnloadTexture(chooseMapBackground);
 
     // Loading screen with real tasks
     bool loading = true;
@@ -104,8 +157,25 @@ while (loading && !WindowShouldClose()) {
     EndDrawing();
 
     // Perform loading tasks step by step
+    int mapWidth = 0;
+    int mapHeight = 0;
+
     if (progress == 0) {
-        tilemap = new Tilemap(20, 10000, 32.0f, dropManager, inventory); // Initialize the Tilemap
+        // Ajustar o tamanho do mapa com base na escolha
+        if (mapSize == 1) { 
+            mapWidth = 5000;  // Mapa pequeno
+            mapHeight = 50;
+        } else if (mapSize == 2) {
+            mapWidth = 10000; // Mapa médio
+            mapHeight = 80;
+        } else if (mapSize == 3) {
+            mapWidth = 20000; // Mapa grande
+            mapHeight = 100;
+        }
+
+        // Inicializar o Tilemap com os valores escolhidos
+        tilemap = new Tilemap(mapHeight, mapWidth, 32.0f, dropManager, inventory);
+
     } else if (progress == 1) {
         tilemap->generateWorld(); // Simulate a heavy task
         WaitTime(0.5);

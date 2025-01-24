@@ -16,6 +16,15 @@ int main()
     bool showMenu = true;
     bool chooseMapSize = false; // LM Controle de escolha do tamanho do mapa
     int mapSize = 0;           // LM Tamanho do mapa (0 = não escolhido, 1 = pequeno, 2 = médio, 3 = grande)
+    // parallax
+    float backgroundWidth = 0;  // largura do fundo
+    float backgroundHeight = 0; //altura do fundo
+    float backgroundOffsetX = 0;
+    float backgroundOffsetY = 0;
+    float verticalAdjustment = -300; // Ajuste vertical para subir a imagem
+    float cloudsVerticalAdjustment = -360; // Ajuste vertical para elevar as nuvens
+    float cloudsOffsetX = 0; //deslocamento das nuvens
+    float cloudsOffsetY = 0; //deslocamento das nuvens
 
     // Carregar a imagem do menu
     Texture2D menuBackground = LoadTexture("sprites/menupixel.png");
@@ -55,7 +64,7 @@ int main()
     }
 
     // imagem de fundo para a tela de escolha do mapa
-    Texture2D chooseMapBackground = LoadTexture("sprites/choosemap.png");
+    Texture2D chooseMapBackground = LoadTexture("sprites/choosemapnovo.png");
 
     // Tela para escolher o tamanho do mapa
     Rectangle smallMapButton = { screenWidth / 2 - 188, screenHeight / 2 + 34, 377, 61 };
@@ -207,31 +216,84 @@ while (loading && !WindowShouldClose()) {
     player.setPosition(playerPos);
     player.initializeCamera(*tilemap);
     
-    
-    
-
+    //PARALLAX DO LM
+    BackGround = LoadTexture("sprites/basesemnuvens.png");
+    backgroundWidth = BackGround.width;
+    backgroundHeight = BackGround.height;
 
     while (!WindowShouldClose())
     {
-        // Update the player
+        // Atualizar o jogador
         player.Update(*tilemap);
+
+        // Atualizar o deslocamento do fundo com base na velocidade do jogador
+        Vector2 playerSpeed = player.getSpeed();
+        // TraceLog para exibir os valores de velocidade do jogador no console
+        TraceLog(LOG_INFO, "Player Speed: x=%.2f, y=%.2f", playerSpeed.x, playerSpeed.y);
+        backgroundOffsetX -= playerSpeed.x * 0.2f; // Movimento horizontal (parallax suave)
+        backgroundOffsetY -= playerSpeed.y * 0.2f; // Movimento vertical (parallax suave)
+
+        // Garantir o looping
+        if (backgroundOffsetX <= -backgroundWidth) backgroundOffsetX += backgroundWidth;
+        if (backgroundOffsetX >= backgroundWidth) backgroundOffsetX -= backgroundWidth;
+        if (backgroundOffsetY <= -backgroundHeight) backgroundOffsetY += backgroundHeight;
+        if (backgroundOffsetY >= backgroundHeight) backgroundOffsetY -= backgroundHeight;
+
+        // Atualizar o deslocamento das nuvens (movem-se mais devagar dando sensação de profundidade)
+        cloudsOffsetX -= playerSpeed.x * 0.1f; // Movimento horizontal das nuvens
+        cloudsOffsetY -= playerSpeed.y * 0.1f; // Movimento vertical das nuvens
+
+        // Garantir o looping das nuvens
+        if (cloudsOffsetX <= -backgroundWidth) cloudsOffsetX += backgroundWidth;
+        if (cloudsOffsetX >= backgroundWidth) cloudsOffsetX -= backgroundWidth;
+        if (cloudsOffsetY <= -backgroundHeight) cloudsOffsetY += backgroundHeight;
+        if (cloudsOffsetY >= backgroundHeight) cloudsOffsetY -= backgroundHeight;
 
         BeginDrawing();
         ClearBackground(Black);
-        DrawTexture(BackGround, 0, -400, WHITE);
-        DrawTexture(clouds, 0, -400, WHITE);
+
+        // Desenhar o fundo com efeito de looping
+        DrawTexture(BackGround, backgroundOffsetX, backgroundOffsetY + verticalAdjustment, WHITE);
+        DrawTexture(BackGround, backgroundOffsetX + backgroundWidth, backgroundOffsetY + verticalAdjustment, WHITE);
+        DrawTexture(BackGround, backgroundOffsetX - backgroundWidth, backgroundOffsetY + verticalAdjustment, WHITE);
+
+        DrawTexture(BackGround, backgroundOffsetX, backgroundOffsetY + backgroundHeight + verticalAdjustment, WHITE);
+        DrawTexture(BackGround, backgroundOffsetX, backgroundOffsetY - backgroundHeight + verticalAdjustment, WHITE);
+
+        DrawTexture(BackGround, backgroundOffsetX + backgroundWidth, backgroundOffsetY + backgroundHeight + verticalAdjustment, WHITE);
+        DrawTexture(BackGround, backgroundOffsetX - backgroundWidth, backgroundOffsetY + backgroundHeight + verticalAdjustment, WHITE);
+        DrawTexture(BackGround, backgroundOffsetX + backgroundWidth, backgroundOffsetY - backgroundHeight + verticalAdjustment, WHITE);
+        DrawTexture(BackGround, backgroundOffsetX - backgroundWidth, backgroundOffsetY - backgroundHeight + verticalAdjustment, WHITE);
+
+        // Desenhar as nuvens com ajuste vertical e parallax mais lento
+        DrawTexture(clouds, cloudsOffsetX, cloudsOffsetY + cloudsVerticalAdjustment, WHITE);
+        DrawTexture(clouds, cloudsOffsetX + backgroundWidth, cloudsOffsetY + cloudsVerticalAdjustment, WHITE);
+        DrawTexture(clouds, cloudsOffsetX - backgroundWidth, cloudsOffsetY + cloudsVerticalAdjustment, WHITE);
+        DrawTexture(clouds, cloudsOffsetX, cloudsOffsetY + backgroundHeight + cloudsVerticalAdjustment, WHITE);
+        DrawTexture(clouds, cloudsOffsetX, cloudsOffsetY - backgroundHeight + cloudsVerticalAdjustment, WHITE);
+        DrawTexture(clouds, cloudsOffsetX + backgroundWidth, cloudsOffsetY + backgroundHeight + cloudsVerticalAdjustment, WHITE);
+        DrawTexture(clouds, cloudsOffsetX - backgroundWidth, cloudsOffsetY + backgroundHeight + cloudsVerticalAdjustment, WHITE);
+        DrawTexture(clouds, cloudsOffsetX + backgroundWidth, cloudsOffsetY - backgroundHeight + cloudsVerticalAdjustment, WHITE);
+        DrawTexture(clouds, cloudsOffsetX - backgroundWidth, cloudsOffsetY - backgroundHeight + cloudsVerticalAdjustment, WHITE);
+
+
+        // Desenhar o restante do jogo
+        // DrawTexture(clouds, 0, -400, WHITE); // Camada de nuvens (caso necessário)
 
         BeginMode2D(player.getCamera());
             tilemap->Draw(player.getCamera(), 32);
             player.Draw();
             tilemap->TilePlacement(player.getCamera(), tilemap->getTileSize(), player.getPosition(), DropsSheet, BlocksSheet);
         EndMode2D();
+
         tilemap->UpdateInventory();
         tilemap->DrawInventory();
 
+   
+    
 
         Vector2 playerPosition = player.getPosition(); 
-        Vector2 playerSpeed = player.getSpeed();        
+        playerSpeed = player.getSpeed(); //lm ctrl z     
         bool isGrounded = player.isGrounded();         
         Rectangle playerRec = player.getRec();         
         DrawText(TextFormat("Position: (%.2f, %.2f)", playerPosition.x, playerPosition.y), 10, 10, 20, RAYWHITE);

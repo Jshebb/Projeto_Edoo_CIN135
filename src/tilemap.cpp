@@ -272,7 +272,23 @@ void Tilemap::setTexture(Texture2D spriteSheet) {
     }
 }
 
-void Tilemap::TilePlacement(const Camera2D& camera, int tileSize, Vector2 PlayerPos, Texture2D SpriteSheetDrops, Texture2D SpriteSheetBlocks) {
+// Function to find the ground level (highest solid tile, corresponding to smallest Y) for the player's X position
+int Tilemap::getGroundLevel(int x) {
+    // Convert the X position to the column index in the tile array
+    int column = x / tileSize; 
+
+    // Start from the top of the map and move downward
+    for (int y = 0; y < rows; ++y) {
+        if (tiles[y][column].isSolid()) {
+            return ((y * tileSize) - 64);  // Return the Y position of the first solid tile found
+        }
+    }
+    return -1; // Return -1 if no solid tile is found
+}
+
+
+void Tilemap::TilePlacement(const Camera2D& camera, int tileSize, Vector2 PlayerPos, 
+                            Texture2D SpriteSheetDrops, Texture2D SpriteSheetBlocks) {
     // Get world mouse position (adjusted for camera)
     Vector2 mousePosition = GetMousePosition();
     Vector2 worldMousePos = GetScreenToWorld2D(mousePosition, camera);
@@ -291,31 +307,20 @@ void Tilemap::TilePlacement(const Camera2D& camera, int tileSize, Vector2 Player
             static_cast<float>(tileSize), 
             static_cast<float>(tileSize) 
         };
-        float interactionRange = 100.0f; // Define interactionRange
-        if (Vector2Distance(PlayerPos, {static_cast<float>(mouseTileX * tileSize), static_cast<float>(mouseTileY * tileSize)}) <= interactionRange){
-            // Check if the tile is solid (assuming you have a method like isSolid)
+        float interactionRange = 100.0f; // Define interaction range
+        if (Vector2Distance(PlayerPos, {static_cast<float>(mouseTileX * tileSize), static_cast<float>(mouseTileY * tileSize)}) <= interactionRange) {
+            // Check if the tile is solid and draw highlight
             if (tiles[mouseTileY][mouseTileX].isSolid()) {
-                // Draw a transparent overlay: solid tiles get a transparent black overlay, non-solid tiles get white
                 DrawRectangleRec(highlightRect, (Color){ 0, 0, 0, 32 });
-            } 
-            else {
+            } else {
                 DrawRectangleRec(highlightRect, (Color){ 255, 255, 255, 32 });
             }
 
-
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && tiles[mouseTileY][mouseTileX].isSolid() && tiles[mouseTileY][mouseTileX].getID() != 4 &&
-            tiles[mouseTileY][mouseTileX].getID() != 5 ){
+            // Handle left-click (breaking tiles)
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && tiles[mouseTileY][mouseTileX].isSolid() && 
+                tiles[mouseTileY][mouseTileX].getID() != 4 && tiles[mouseTileY][mouseTileX].getID() != 5) {
+                // Existing logic for breaking tiles and spawning drops
                 Tile dropTile = getTileAt(worldMousePos.x, worldMousePos.y);
-
-                // Calculate the source rectangle for the drop sprite based on the tile ID
-                Rectangle sourceRect = {
-                    static_cast<float>((dropTile.getID() - 1) * 32), // Horizontal offset based on ID
-                    0.0f,                                            // Row 0 (only one row in this spritesheet)
-                    32.0f,                                           // Tile width
-                    32.0f                                            // Tile height
-                };
-
-                // Create a drop item with the correct sourceRect for the sprite
                 if (dropTile.getID() == 1) {
                     Item drop("grass", 1, 1, {mouseTileX * tileSize, mouseTileY * tileSize}, SpriteSheetDrops, {mouseTileX * tileSize, mouseTileY * tileSize});
                     dropManager.addDrop(drop);
@@ -326,52 +331,60 @@ void Tilemap::TilePlacement(const Camera2D& camera, int tileSize, Vector2 Player
                     Item drop("stone", 3, 1, {mouseTileX * tileSize, mouseTileY * tileSize}, SpriteSheetDrops, {mouseTileX * tileSize, mouseTileY * tileSize});
                     dropManager.addDrop(drop);
                 }
-            
 
-            if (dropTile.getID() == 3) {
-                // Replace the broken tile with an id == 4 tile
-                setTile(mouseTileX, mouseTileY, false, DARKGRAY, 4); // Example replacement color and ID
-                tiles[mouseTileY][mouseTileX].setTexture(SpriteSheetBlocks);
-                
-            } 
-            else if (dropTile.getID() == 2){
-                // Replace the broken tile with an id == 6 tile
-                setTile(mouseTileX, mouseTileY, false, DARKGRAY, 6);
-                tiles[mouseTileY][mouseTileX].setTexture(SpriteSheetBlocks);
-            }
-            else {
-                    // Remove the tile for other IDs
+                // Replace or remove tile
+                if (dropTile.getID() == 3) {
+                    setTile(mouseTileX, mouseTileY, false, DARKGRAY, 4);
+                    tiles[mouseTileY][mouseTileX].setTexture(SpriteSheetBlocks);
+                } else if (dropTile.getID() == 2) {
+                    setTile(mouseTileX, mouseTileY, false, DARKGRAY, 6);
+                    tiles[mouseTileY][mouseTileX].setTexture(SpriteSheetBlocks);
+                } else {
                     setTile(mouseTileX, mouseTileY, false, BLACK, 0);
                 }
             }
+
+            // Handle right-click (placing tiles)
             if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) && !tiles[mouseTileY][mouseTileX].isSolid()) {
                 // Check if the placement position overlaps with the player's position
                 Rectangle playerRect = { PlayerPos.x, PlayerPos.y, static_cast<float>(tileSize), static_cast<float>(tileSize * 2) }; // Adjusted for player height
                 Rectangle tileRect = { static_cast<float>(mouseTileX * tileSize), static_cast<float>(mouseTileY * tileSize), static_cast<float>(tileSize), static_cast<float>(tileSize) };
 
                 if (!CheckCollisionRecs(playerRect, tileRect)) {
-                    setTile(mouseTileX, mouseTileY, true, GREEN, 5); 
-                    tiles[mouseTileY][mouseTileX].setTexture(SpriteSheetBlocks);
+                    // Check if the selected inventory slot has a valid block to place
+                    Item& selectedItem = inventory.getSelectedItem();
+                    if (selectedItem.id != -1 && selectedItem.quantity > 0) {
+                        // Determine the block type and place it
+                        Color blockColor = BLACK; // Default color
+                        int blockID = 0;          // Default ID
+                        if (selectedItem.id == 1) {
+                            blockColor = GREEN; // Grass
+                            blockID = 1;
+                        } else if (selectedItem.id == 2) {
+                            blockColor = BROWN; // Dirt
+                            blockID = 2;
+                        } else if (selectedItem.id == 3) {
+                            blockColor = GRAY;  // Stone
+                            blockID = 3;
+                        }
+
+                        if (blockID != 0) { // Valid block
+                            setTile(mouseTileX, mouseTileY, true, blockColor, blockID);
+                            tiles[mouseTileY][mouseTileX].setTexture(SpriteSheetBlocks);
+
+                            // Decrease quantity in the inventory
+                            selectedItem.quantity--;
+                            if (selectedItem.quantity <= 0) {
+                                inventory.clearSelectedItem(); // Clear the slot if empty
+                            }
+                        }
+                    }
                 }
             }
         }
         dropManager.drawDrops();
         dropManager.updateDrops(PlayerPos, 300.0f, inventory);
     }
-}
-
-// Function to find the ground level (highest solid tile, corresponding to smallest Y) for the player's X position
-int Tilemap::getGroundLevel(int x) {
-    // Convert the X position to the column index in the tile array
-    int column = x / tileSize; 
-
-    // Start from the top of the map and move downward
-    for (int y = 0; y < rows; ++y) {
-        if (tiles[y][column].isSolid()) {
-            return ((y * tileSize) - 64);  // Return the Y position of the first solid tile found
-        }
-    }
-    return -1; // Return -1 if no solid tile is found
 }
 
 DropManager& Tilemap::getDropManager(){
@@ -385,5 +398,8 @@ void Tilemap::DrawInventory(){
 
 void Tilemap::UpdateInventory(){
     // Update the inventory
-    inventory.Update();
+    Item out = inventory.Update();
+    if(out.id != -1){
+        dropManager.addDrop(out);
+    }
 }

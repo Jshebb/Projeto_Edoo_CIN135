@@ -159,10 +159,6 @@ while (loading && !WindowShouldClose()) {
         tilemap->UpdateInventory();
         tilemap->DrawInventory();
 
-   
-
-        
-        
 
         Vector2 playerPosition = player.getPosition(); 
         Vector2 playerSpeed = player.getSpeed();        

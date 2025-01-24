@@ -6,6 +6,7 @@
 #include <string>
 #include "raylib.h"
 
+
 // Class to represent an item that can be dropped
 class Item {
 public:
@@ -25,8 +26,12 @@ class Inventory {
     Inventory(float x, float y, Texture2D& sprite ,float slotSize = 48.0f, float padding = 10.0f);
     bool addItem(const Item& item);
     void removeItem(int slotIndex);
-    void Update();
+    Item Update();
     void Draw();
+    // Get the currently selected item
+    Item& getSelectedItem();
+    // Clear the selected item (reduce count or remove entirely)
+    void clearSelectedItem();
 
     private:
     std::vector<Item> items;
@@ -34,6 +39,8 @@ class Inventory {
     Rectangle slotRects[maxSlots];
     int selectedIndex = -1;
     Texture2D sprite;
+    Item grabbedItem;
+    bool hasGrabbedItem = false; // Whether the player is holding an item
 
     void initializeSlotRects(float x, float y, float slotSize, float padding);
 };

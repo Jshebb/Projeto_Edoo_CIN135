@@ -5,6 +5,7 @@
 #include "raymath.h"
 #include <iostream> 
 
+
 // Default constructor
 Item::Item(): 
 name(""), 
@@ -23,6 +24,7 @@ Item::Item(std::string name, int id, int quantity, Vector2 position, Texture2D d
 
 // DropManager constructor
 DropManager::DropManager(int maxDrops) : maxDrops(maxDrops) {}
+
 
 
 
@@ -68,89 +70,34 @@ void Inventory::removeItem(int slotIndex) {
     }
 }
 
-void Inventory::Update() {
-    // Handle mouse interactions
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        Vector2 mousePos = GetMousePosition();
-            
-        // Check slot selection
-        for (int i = 0; i < maxSlots; i++) {
-            if (CheckCollisionPointRec(mousePos, slotRects[i])) {
-                    selectedIndex = i;
-                    break;
-            }
-        }
-    }
-}
+
 
 void Inventory::Draw() {
-    // Draw slot backgrounds using the inventorySprite
+    // Draw the slots and items
     for (int i = 0; i < maxSlots; i++) {
-        // Calculate source rectangle for slot background sprite
-        Rectangle slotSourceRect = { 0.0f, 0.0f, 64.0f, 64.0f }; // Slot sprite size (64x64)
-        
-        // Determine destination rectangle for slot background
-        Rectangle slotDestRect = {
-            slotRects[i].x,         // X position
-            slotRects[i].y,         // Y position
-            64.0f,                  // Width of the slot
-            64.0f                   // Height of the slot
-        };
+        Rectangle slotSourceRect = {0.0f, 0.0f, 64.0f, 64.0f};
+        Rectangle slotDestRect = {slotRects[i].x, slotRects[i].y, 64.0f, 64.0f};
+        Color slotTint = (i == selectedIndex) ? YELLOW : WHITE;
 
-        // Highlight selected slot by modifying the tint
-        Color slotTint = (i == selectedIndex) 
-            ? YELLOW
-            : WHITE;
+        DrawTexturePro(sprite, slotSourceRect, slotDestRect, {0.0f, 0.0f}, 0.0f, slotTint);
 
-        // Draw the slot sprite
-        DrawTexturePro(
-            sprite,            // Texture for slot background
-            slotSourceRect,    // Source rectangle
-            slotDestRect,      // Destination rectangle
-            { 0.0f, 0.0f },    // Origin (top-left corner)
-            0.0f,              // Rotation
-            slotTint           // Tint color
-        );
-
-        std::cout << "Id " << items[i].id << std::endl;
-
-        // Draw item if it exists
         if (items[i].id > 0) {
-            // Calculate the source rectangle based on the item's ID (32x32 spritesheet)
-            Rectangle itemSourceRect = {
-                static_cast<float>((items[i].id - 1) * 32), // X position in the spritesheet (32px per tile)
-                0.0f,                                       // Y position in the spritesheet (row 0)
-                32.0f,                                      // Width of the item sprite
-                32.0f                                       // Height of the item sprite
-            };
+            Rectangle itemSourceRect = {static_cast<float>((items[i].id - 1) * 32), 0.0f, 32.0f, 32.0f};
+            Rectangle itemDestRect = {slotRects[i].x, slotRects[i].y, 64.0f, 64.0f};
 
-            // Define the destination rectangle to scale the item to 64x64
-            Rectangle itemDestRect = {
-                slotRects[i].x,       // X position in the slot
-                slotRects[i].y,       // Y position in the slot
-                64.0f,                // Stretch width to 64px
-                64.0f                 // Stretch height to 64px
-            };
-
-            // Draw the item's sprite stretched to 64x64
-            DrawTexturePro(
-                items[i].dropSprite,  // Texture (spritesheet)
-                itemSourceRect,       // Source rectangle
-                itemDestRect,         // Destination rectangle (scaled to 64x64)
-                { 0.0f, 0.0f },       // Origin (top-left corner)
-                0.0f,                 // Rotation
-                WHITE                 // Tint color
-            );
-
-            // Draw the item's quantity
-            DrawText(
-                TextFormat("x%d", items[i].quantity), 
-                slotRects[i].x + 10, 
-                slotRects[i].y + 40, 
-                20, 
-                WHITE
-            );
+            DrawTexturePro(items[i].dropSprite, itemSourceRect, itemDestRect, {0.0f, 0.0f}, 0.0f, WHITE);
+            DrawText(TextFormat("x%d", items[i].quantity), slotRects[i].x + 10, slotRects[i].y + 40, 20, WHITE);
         }
+    }
+
+    // Draw the grabbed item near the cursor if it exists
+    if (hasGrabbedItem) {
+        Vector2 mousePos = GetMousePosition();
+        Rectangle grabbedSourceRect = {static_cast<float>((grabbedItem.id - 1) * 32), 0.0f, 32.0f, 32.0f};
+        Rectangle grabbedDestRect = {mousePos.x - 32.0f, mousePos.y - 32.0f, 64.0f, 64.0f};
+
+        DrawTexturePro(grabbedItem.dropSprite, grabbedSourceRect, grabbedDestRect, {0.0f, 0.0f}, 0.0f, WHITE);
+        DrawText(TextFormat("x%d", grabbedItem.quantity), mousePos.x + 10, mousePos.y + 10, 20, WHITE);
     }
 }
 
@@ -209,5 +156,101 @@ void DropManager::drawDrops() {
     }
 }
 
+Item Inventory::Update() {
+    Vector2 mousePos = GetMousePosition();
+    bool clickedInsideInventory = false;
 
+    // Default return value
+    Item defaultItem = {}; // Create an empty/default item to return if nothing is dropped
+
+    // Handle mouse clicks
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        for (int i = 0; i < maxSlots; i++) {
+            if (CheckCollisionPointRec(mousePos, slotRects[i])) {
+                clickedInsideInventory = true; // Mouse clicked inside inventory
+                
+                // Select the item when clicking a slot
+                selectedIndex = i;
+                printf("Slot %d selected.\n", selectedIndex); // Debug message
+                
+                // If holding an item, place it in the selected slot
+                if (hasGrabbedItem) {
+                    if (items[i].id == -1) { // Empty slot, place the grabbed item
+                        items[i] = grabbedItem;
+                        grabbedItem = {}; // Clear the grabbed item
+                        hasGrabbedItem = false;
+                    } else if (items[i].id == grabbedItem.id && items[i].quantity < 99) {
+                        // Stack the grabbed item if possible
+                        int space = 99 - items[i].quantity;
+                        int transfer = std::min(space, grabbedItem.quantity);
+                        items[i].quantity += transfer;
+                        grabbedItem.quantity -= transfer;
+
+                        if (grabbedItem.quantity <= 0) {
+                            grabbedItem = {}; // Clear the grabbed item
+                            hasGrabbedItem = false;
+                        }
+                    }
+                } else {
+                    // If not holding an item, grab the item from the selected slot
+                    if (items[i].id != -1) {
+                        grabbedItem = items[i];
+                        hasGrabbedItem = true;
+                        items[i] = {}; // Clear the slot
+                    }
+                }
+                break; // Exit the loop after processing the click
+            }
+        }
+
+        // Drop item if clicked outside inventory while holding an item
+        if (!clickedInsideInventory && hasGrabbedItem) {
+            grabbedItem.position = mousePos; // Drop the item at the mouse position
+            hasGrabbedItem = false;         // Release the item
+            Item out = grabbedItem;
+            grabbedItem = {};               // Clear the grabbed item
+            return out;                     // Return the dropped item
+        }
+    }
+
+    // Handle mouse wheel scrolling
+    float mouseWheel = GetMouseWheelMove(); // Get mouse wheel movement
+    if (mouseWheel != 0) {
+        selectedIndex += (mouseWheel > 0) ? -1 : 1; // Scroll up decreases index, scroll down increases it
+
+        // Wrap around if selectedIndex is out of bounds
+        if (selectedIndex < 0) {
+            selectedIndex = maxSlots - 1; // Wrap around to the last slot
+        } else if (selectedIndex >= maxSlots) {
+            selectedIndex = 0; // Wrap around to the first slot
+        }
+
+        printf("Mouse wheel moved %s. Selected slot: %d\n", 
+            (mouseWheel > 0) ? "up" : "down", selectedIndex); // Debug message
+    }
+
+    // Return default item if no item was dropped
+    return defaultItem;
+}
+
+Item& Inventory::getSelectedItem() {
+    if (selectedIndex >= 0 && selectedIndex < items.size()) {
+        return items[selectedIndex];
+    }
+    // Return a reference to a default static "empty" item if no valid selection
+    static Item emptyItem("empty", -1, 0, {0, 0}, Texture2D{}, {0, 0});
+    return emptyItem;
+}
+
+void Inventory::clearSelectedItem() {
+    if (selectedIndex >= 0 && selectedIndex < items.size()) {
+        if (items[selectedIndex].quantity > 1) {
+            // Decrease the quantity if there's more than one item
+            items[selectedIndex].quantity -= 1;
+        } else {
+            // Remove the item entirely if only one remains
+            items[selectedIndex] = {}; // Replace with a default empty item
+        }
+    }
+}
 

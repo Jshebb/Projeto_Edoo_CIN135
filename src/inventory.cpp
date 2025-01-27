@@ -1,33 +1,33 @@
 #include "inventory.h"
 #include "player.h"
 #include <cmath> // Necessário para std::floor
-#include <algorithm> // Necessário para std::remove_if
+#include <algorithm> 
 #include "raymath.h"
 #include <iostream> 
 
 
-// Default constructor
+// Construtor dos itens default
 Item::Item(): 
 name(""), 
 id(-1), 
 quantity(0),
 position({0, 0}),
 dropSprite({0}),
-basePosition({0, 0}) // Add this for consistent floating
+basePosition({0, 0}) // usado na animacao de floating
 { 
 }
 
 
-// Item constructor
+// Construtor parametrizado de itens
 Item::Item(std::string name, int id, int quantity, Vector2 position, Texture2D dropSprite, Vector2 basePosition)
-    : name(name), id(id), quantity(quantity), position(position), dropSprite(dropSprite), basePosition(basePosition) {} // Add this for consistent floating) {}
+    : name(name), id(id), quantity(quantity), position(position), dropSprite(dropSprite), basePosition(basePosition) {};
 
 // DropManager constructor
 DropManager::DropManager(int maxDrops) : maxDrops(maxDrops) {}
 
 
 
-
+// Inicializacao de slots do inventario
 void Inventory::initializeSlotRects(float x, float y, float slotSize, float padding)
 {
     for (int i = 0; i < maxSlots; i++) {
@@ -52,12 +52,10 @@ bool Inventory::addItem(const Item& item) {
     for (int i = 0; i < maxSlots; i++) {
         if (items[i].id == -1){
             items[i] = item;
-            std::cout << "Item added: " << item.name.c_str() << items[i].id << std::endl;
             return true;
         }
         else if (items[i].id == item.id && items[i].quantity < 99) {
             items[i].quantity += 1;
-            std::cout << "Item added: " << item.name.c_str() << items[i].id << std::endl;
             return true;
         }
     }

@@ -113,10 +113,10 @@ int main()
     // Após terminar o uso, libere a textura
     UnloadTexture(chooseMapBackground);
 
-    // Loading screen with real tasks
+    // Tela de loading
     bool loading = true;
     int progress = 0;
-    const int totalTasks = 7; // Total number of tasks to load (increased by 1 for Tilemap initialization)
+    const int totalTasks = 7; // Tasks de loading
 
     Texture2D BlocksSheet;
     Texture2D DropsSheet;
@@ -127,7 +127,7 @@ int main()
     Texture2D loadingBackground = LoadTexture("sprites/loadingdesfocado.png");
     Texture2D InventoryTile = LoadTexture("sprites/InventoryTile.png");
 
-    Tilemap* tilemap = nullptr; // Pointer for the Tilemap instance
+    Tilemap* tilemap = nullptr; // Ponteiro pro Tilemap
     Player player;
     Inventory inventory(770, 22, InventoryTile);
     DropManager dropManager(30);
@@ -140,7 +140,7 @@ while (loading && !WindowShouldClose()) {
     // Desenhar a imagem de fundo
     DrawTexture(loadingBackground, 0, 0, WHITE);
 
-    // Draw loading text and progress bar
+    // Render de texto de loading e barra de progresso
     DrawText("Loading...", screenWidth / 2 - MeasureText("Loading...", 40) / 2, screenHeight / 2 - 50, 40, WHITE);
     int barWidth = 400;
     int barHeight = 30;
@@ -149,7 +149,7 @@ while (loading && !WindowShouldClose()) {
     DrawRectangle(barX, barY, barWidth, barHeight, DARKGRAY);
     DrawRectangle(barX, barY, (barWidth * progress) / totalTasks, barHeight, GREEN);
 
-    // Display the current task being loaded
+    // Display task atual
     const char* loadingText;
     switch (progress) {
         case 0: loadingText = "Initializing tilemap..."; break;
@@ -165,7 +165,7 @@ while (loading && !WindowShouldClose()) {
 
     EndDrawing();
 
-    // Perform loading tasks step by step
+    // Loading em partes
     int mapWidth = 0;
     int mapHeight = 0;
 
@@ -186,28 +186,28 @@ while (loading && !WindowShouldClose()) {
         tilemap = new Tilemap(mapHeight, mapWidth, 32.0f, dropManager, inventory);
 
     } else if (progress == 1) {
-        tilemap->generateWorld(); // Simulate a heavy task
+        tilemap->generateWorld(); // gera o mundo
         WaitTime(0.5);
     } else if (progress == 2) {
         BlocksSheet = LoadTexture("sprites/BlocksSpriteSheet.png");
     } else if (progress == 3) {
         DropsSheet = LoadTexture("sprites/DropsSpriteSheet.png");
     } else if (progress == 4) {
-        playerSprite = LoadTexture("sprites/Player.png");
-        player.setSprite(playerSprite); // Initialize the player sprite
+        playerSprite = LoadTexture("sprites/playerSheet.png");
+        player.setSprite(playerSprite); // incializa o sprite do player
     } else if (progress == 5) {
         BackGround = LoadTexture("sprites/basesemnuvens.png");
         clouds = LoadTexture("sprites/nuvensfrente.png");
     } else if (progress == 6) {
         InventorySprite = LoadTexture("sprites/inventario.png");
-        tilemap->setTexture(BlocksSheet); // Link textures to the tilemap
-        loading = false; // Finish loading
+        tilemap->setTexture(BlocksSheet); // texturas do tilemap
+        loading = false; // termina o loading
     }
 
     progress++;
 }
 
-
+    // inicializacao de posicao do player
     int x = (10000 / 2) - 32;
     int y = 0;
     Vector2 playerPos = {x, 0};
@@ -221,15 +221,16 @@ while (loading && !WindowShouldClose()) {
     backgroundWidth = BackGround.width;
     backgroundHeight = BackGround.height;
 
+
+    // Loop do jogo
     while (!WindowShouldClose())
     {
+        float deltaTime = GetFrameTime();
         // Atualizar o jogador
-        player.Update(*tilemap);
+        player.Update(*tilemap, deltaTime);
 
         // Atualizar o deslocamento do fundo com base na velocidade do jogador
         Vector2 playerSpeed = player.getSpeed();
-        // TraceLog para exibir os valores de velocidade do jogador no console
-        TraceLog(LOG_INFO, "Player Speed: x=%.2f, y=%.2f", playerSpeed.x, playerSpeed.y);
         backgroundOffsetX -= playerSpeed.x * 0.2f; // Movimento horizontal (parallax suave)
         backgroundOffsetY -= playerSpeed.y * 0.2f; // Movimento vertical (parallax suave)
 
@@ -280,18 +281,20 @@ while (loading && !WindowShouldClose()) {
         // Desenhar o restante do jogo
         // DrawTexture(clouds, 0, -400, WHITE); // Camada de nuvens (caso necessário)
 
+        // Mode 2d para usar a camera 2d
         BeginMode2D(player.getCamera());
             tilemap->Draw(player.getCamera(), 32);
             player.Draw();
             tilemap->TilePlacement(player.getCamera(), tilemap->getTileSize(), player.getPosition(), DropsSheet, BlocksSheet);
         EndMode2D();
 
+        // inventario (render e update)
         tilemap->UpdateInventory();
         tilemap->DrawInventory();
 
    
     
-
+        // Debug
         Vector2 playerPosition = player.getPosition(); 
         playerSpeed = player.getSpeed(); //lm ctrl z     
         bool isGrounded = player.isGrounded();         
@@ -305,6 +308,6 @@ while (loading && !WindowShouldClose()) {
         EndDrawing();
     }
 
-    delete tilemap; // Clean up dynamically allocated memory
+    delete tilemap; // limpa memoria alocada
     CloseWindow();
 }

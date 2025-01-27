@@ -7,20 +7,22 @@
 #include "raylib.h"
 
 
-// Class to represent an item that can be dropped
+// Classe de itens
 class Item {
 public:
     std::string name;
     int id;
     int quantity;
-    Vector2 position;
-    Vector2 basePosition;
+    Vector2 position;   // vector 2 par ordenado de posicao
+    Vector2 basePosition;   // posicao base para animacao de flutuar
     Texture2D dropSprite;
     Item();
 
     Item(std::string name, int id, int quantity, Vector2 position, Texture2D dropSprite, Vector2 basePosition);
 };
 
+
+// classe do inventario do jogador
 class Inventory {
     public:
     Inventory(float x, float y, Texture2D& sprite ,float slotSize = 48.0f, float padding = 10.0f);
@@ -28,24 +30,24 @@ class Inventory {
     void removeItem(int slotIndex);
     Item Update();
     void Draw();
-    // Get the currently selected item
+    //Item selecionado
     Item& getSelectedItem();
-    // Clear the selected item (reduce count or remove entirely)
+    // Limpa item selecionado
     void clearSelectedItem();
 
     private:
-    std::vector<Item> items;
+    std::vector<Item> items;    // Vector1 para uma lista de itens
     static const int maxSlots = 8;
-    Rectangle slotRects[maxSlots];
+    Rectangle slotRects[maxSlots];  // recs de colisao do inventario
     int selectedIndex = -1;
     Texture2D sprite;
     Item grabbedItem;
-    bool hasGrabbedItem = false; // Whether the player is holding an item
+    bool hasGrabbedItem = false; // Se o jogador segura um item
 
-    void initializeSlotRects(float x, float y, float slotSize, float padding);
+    void initializeSlotRects(float x, float y, float slotSize, float padding); // inicializa os slots do inventario
 };
 
-// Drop manager class to manage block drops
+// Drop manager, classe para manejar animacao e drops de itens no geral
 class DropManager {
 public:
     DropManager(int maxDropsm);

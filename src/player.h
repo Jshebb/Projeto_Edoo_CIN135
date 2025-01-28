@@ -25,6 +25,7 @@ private:
     int currentFrame;          // Current animation frame
     float frameTime;           // Time accumulator for frame updates
     float frameDuration;       // Duration of each frame (in seconds)
+    bool isFlipped; //Se o sprite do player for espelhado
 
     // Camera
     Camera2D camera;           // Camera

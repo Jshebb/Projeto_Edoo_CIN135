@@ -178,8 +178,8 @@ while (loading && !WindowShouldClose()) {
             mapWidth = 10000; // Mapa médio
             mapHeight = 80;
         } else if (mapSize == 3) {
-            mapWidth = 20000; // Mapa grande
-            mapHeight = 100;
+            mapWidth = 100000; // Mapa grande
+            mapHeight = 200;
         }
 
         // Inicializar o Tilemap com os valores escolhidos
@@ -187,7 +187,6 @@ while (loading && !WindowShouldClose()) {
 
     } else if (progress == 1) {
         tilemap->generateWorld(); // gera o mundo
-        WaitTime(0.5);
     } else if (progress == 2) {
         BlocksSheet = LoadTexture("sprites/BlocksSpriteSheet.png");
     } else if (progress == 3) {
@@ -219,7 +218,7 @@ while (loading && !WindowShouldClose()) {
     //PARALLAX DO LM
     BackGround = LoadTexture("sprites/basesemnuvens.png");
     backgroundWidth = BackGround.width;
-    backgroundHeight = BackGround.height;
+    backgroundHeight = BackGround.height + tilemap->getRows();
 
 
     // Loop do jogo

@@ -21,7 +21,8 @@ Player::Player()
       currentState(IDLE),    // Default currentState is idle
       currentFrame(0),       // Default frame is 0
       frameTime(0.0f),       // Initialize frame time to 0
-      frameDuration(0.1f)    // Duration per frame (in seconds)
+      frameDuration(0.1f),    // Duration per frame (in seconds)
+      isFlipped(false)
 {
     updateRectangles();
 }
@@ -137,6 +138,13 @@ void Player::Update(const Tilemap& tilemap, float deltaTime) {
         }
     }
 
+    if (speed.x > 0){
+        isFlipped = false;
+    }
+    else if (speed.x < 0){
+        isFlipped = true;
+    }
+
     // Smoothly update camera to follow the player
     float cameraSmoothness = 0.1f;  // Lower values for slower, smoother movement
     Vector2 desiredTarget = { position.x + width / 2, position.y + height / 2 };
@@ -170,19 +178,20 @@ void Player::Draw() const {
     // Define the destination rectangle (scaled to 64x64) with a height offset
     Rectangle destRec = { position.x - 16, position.y - 32.0f, 64.0f, 64.0f };
 
-    // Flip horizontally if moving left
-    if (speed.x < 0) {
-        sourceRec.width = -sourceRec.width; // Flip the width of the source rectangle
-        sourceRec.x += sourceRec.width;     // Adjust the x position of the source rectangle to compensate for the flip
-        destRec.x += 16.0f;                // Adjust the position for the flipped sprite
+    if (isFlipped) {
+        sourceRec.width = -32;              // espelha o player
+    } else {
+        sourceRec.width = 32;             
     }
 
     // Origin is set to (0, 0), no rotation
     Vector2 origin = { 0, 0 };
 
-    // Draw the sprite (flip handled by modifying the source rectangle)
+    // Draw the sprite (flip handled by modifying the sourceRec)
     DrawTexturePro(playerSprite, sourceRec, destRec, origin, 0.0f, WHITE);
 }
+
+
 
 
 
@@ -202,6 +211,7 @@ void Player::setPosition(Vector2 newPosition) {
 
 void Player::setSpeed(Vector2 newSpeed) { speed = newSpeed; }
 void Player::setSprite(Texture2D sprite) { playerSprite = sprite; }
+
 
 Rectangle Player::getRec() const {
     return playerRec;

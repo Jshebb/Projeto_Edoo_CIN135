@@ -161,6 +161,15 @@ Item Inventory::Update() {
     // Default return value
     Item defaultItem = {}; // Create an empty/default item to return if nothing is dropped
 
+    // Handle number key selection (keys 1 to 8)
+    for (int key = KEY_ONE; key <= KEY_EIGHT; ++key) {
+        if (IsKeyPressed(key)) {
+            selectedIndex = key - KEY_ONE; // Convert key to slot index (0-based)
+            printf("Slot %d selected via key press.\n", selectedIndex + 1); // Debug message
+            break;
+        }
+    }
+
     // Handle mouse clicks
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         for (int i = 0; i < maxSlots; i++) {
@@ -169,7 +178,6 @@ Item Inventory::Update() {
                 
                 // Select the item when clicking a slot
                 selectedIndex = i;
-                printf("Slot %d selected.\n", selectedIndex); // Debug message
                 
                 // If holding an item, place it in the selected slot
                 if (hasGrabbedItem) {
@@ -222,9 +230,6 @@ Item Inventory::Update() {
         } else if (selectedIndex >= maxSlots) {
             selectedIndex = 0; // Wrap around to the first slot
         }
-
-        printf("Mouse wheel moved %s. Selected slot: %d\n", 
-            (mouseWheel > 0) ? "up" : "down", selectedIndex); // Debug message
     }
 
     // Return default item if no item was dropped

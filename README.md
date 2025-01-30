@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="sprites/logo.png" width="300" height="300" alt="C+Mine, nome do jogo">
+  <img src="release/sprites/logo.png" width="300" height="300" alt="C+Mine, nome do jogo">
 </p>
 
 # Projeto_Edoo_CIN135

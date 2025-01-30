@@ -25,7 +25,7 @@ C+Mine é um jogo do gênero sandbox que gera um mundo aleatóriamente, permitin
 
 ## Características Principais:
 * Linguagem: __C++__
-* Bibliotecas: __Raylib__ (Gráficos e Input) e __SimplexNoise)) (Geração aleatória de mundo)
+* Bibliotecas: __Raylib__ (Gráficos e Input) e __SimplexNoise__ (Geração aleatória de mundo)
 
 ## Como Jogar
 * Inicie o jogo e __escolha o tamanho do mapa__ (Pequeno, Médio ou Grande).

@@ -3,7 +3,7 @@
 </p>
 
 # Projeto Edoo CIN135: C+Mine
-C+Mine é um jogo do gênero sandbox que gera um mundo proceduralmente, permitindo exploração, mineração e interação com um ambiente dinâmico. O jogo é desenvolvido em C++ utilizando a biblioteca raylib para renderização gráfica e SimplexNoise para a geração de terreno procedural.
+C+Mine é um jogo do gênero sandbox que gera um mundo aleatória, permitindo exploração, mineração e interação com um ambiente dinâmico. O jogo é desenvolvido em C++ utilizando a biblioteca raylib para renderização gráfica e SimplexNoise para a geração de terreno procedural.
 
 ## Capturas de Tela
 <div style="display: flex; justify-content: space-around;">

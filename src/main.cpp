@@ -231,8 +231,8 @@ while (loading && !WindowShouldClose()) {
 
         // Atualizar o deslocamento do fundo com base na velocidade do jogador
         Vector2 playerSpeed = player.getSpeed();
-        backgroundOffsetX -= playerSpeed.x * 0.2f; // Movimento horizontal (parallax suave)
-        backgroundOffsetY -= playerSpeed.y * 0.2f; // Movimento vertical (parallax suave)
+        backgroundOffsetX -= playerSpeed.x * 0.1f; // Movimento horizontal (parallax suave)
+        backgroundOffsetY -= playerSpeed.y * 0.1f; // Movimento vertical (parallax suave)
 
         // Garantir o looping
         if (backgroundOffsetX <= -backgroundWidth) backgroundOffsetX += backgroundWidth;
@@ -241,8 +241,8 @@ while (loading && !WindowShouldClose()) {
         if (backgroundOffsetY >= backgroundHeight) backgroundOffsetY -= backgroundHeight;
 
         // Atualizar o deslocamento das nuvens (movem-se mais devagar dando sensação de profundidade)
-        cloudsOffsetX -= playerSpeed.x * 0.1f; // Movimento horizontal das nuvens
-        cloudsOffsetY -= playerSpeed.y * 0.1f; // Movimento vertical das nuvens
+        cloudsOffsetX -= playerSpeed.x * 0.2f; // Movimento horizontal das nuvens
+        cloudsOffsetY -= playerSpeed.y * 0.2f; // Movimento vertical das nuvens
 
         // Garantir o looping das nuvens
         if (cloudsOffsetX <= -backgroundWidth) cloudsOffsetX += backgroundWidth;

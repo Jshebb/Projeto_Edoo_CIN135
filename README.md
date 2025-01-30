@@ -33,7 +33,7 @@ C+Mine é um jogo do gênero sandbox que gera um mundo aleatóriamente, permitin
 * __Pule__ com a tecla __Espaço__.
 * __Quebre blocos__ com o __botão esquerdo__ do mouse.
 * __Coloque blocos__ com o __botão direito__ do mouse, caso tenha itens no inventário.
-* Gerencie seu inventário com as teclas __1 a 8__ ou o __scroll__ do mouse.
+* __Gerencie seu inventário__ com as teclas __1 a 8__ ou o __scroll__ do mouse.
 
 ## Assets
 Player Sprites - SunnyLand free 2d sprite collection, all credits to original asset creator at https://ansimuz.itch.io/sunny-land-pixel-game-art

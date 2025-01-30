@@ -15,8 +15,8 @@ int main()
     SetTargetFPS(60); // taxa de quadros por segundo
 
     bool showMenu = true;
-    bool chooseMapSize = false; // LM Controle de escolha do tamanho do mapa
-    int mapSize = 0;           // LM Tamanho do mapa (0 = não escolhido, 1 = pequeno, 2 = médio, 3 = grande)
+    bool chooseMapSize = false; // Controle de escolha do tamanho do mapa
+    int mapSize = 0;           // Tamanho do mapa (0 = não escolhido, 1 = pequeno, 2 = médio, 3 = grande)
     // parallax
     float backgroundWidth = 0;  // largura do fundo
     float backgroundHeight = 0; //altura do fundo
@@ -40,7 +40,7 @@ int main()
 
         if (startButtonHovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             showMenu = false;
-            chooseMapSize = true; // LM tela de escolha do tamanho do mapa
+            chooseMapSize = true; // tela de escolha do tamanho do mapa
         }
         if (exitButtonHovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             CloseWindow();
@@ -216,7 +216,7 @@ while (loading && !WindowShouldClose()) {
     player.setPosition(playerPos);
     player.initializeCamera(*tilemap);
     
-    //PARALLAX DO LM
+    //PARALLAX
     BackGround = LoadTexture("sprites/basesemnuvens.png");
     backgroundWidth = BackGround.width;
     backgroundHeight = BackGround.height + tilemap->getRows();
@@ -231,8 +231,8 @@ while (loading && !WindowShouldClose()) {
 
         // Atualizar o deslocamento do fundo com base na velocidade do jogador
         Vector2 playerSpeed = player.getSpeed();
-        backgroundOffsetX -= playerSpeed.x * 0.2f; // Movimento horizontal (parallax suave)
-        backgroundOffsetY -= playerSpeed.y * 0.2f; // Movimento vertical (parallax suave)
+        backgroundOffsetX -= playerSpeed.x * 0.1f; // Movimento horizontal (parallax suave)
+        backgroundOffsetY -= playerSpeed.y * 0.02f; // Movimento vertical (parallax suave)
 
         // Garantir o looping
         if (backgroundOffsetX <= -backgroundWidth) backgroundOffsetX += backgroundWidth;
@@ -241,8 +241,8 @@ while (loading && !WindowShouldClose()) {
         if (backgroundOffsetY >= backgroundHeight) backgroundOffsetY -= backgroundHeight;
 
         // Atualizar o deslocamento das nuvens (movem-se mais devagar dando sensação de profundidade)
-        cloudsOffsetX -= playerSpeed.x * 0.1f; // Movimento horizontal das nuvens
-        cloudsOffsetY -= playerSpeed.y * 0.1f; // Movimento vertical das nuvens
+        cloudsOffsetX -= playerSpeed.x * 0.2f; // Movimento horizontal das nuvens
+        cloudsOffsetY -= playerSpeed.y * 0.04f; // Movimento vertical das nuvens
 
         // Garantir o looping das nuvens
         if (cloudsOffsetX <= -backgroundWidth) cloudsOffsetX += backgroundWidth;

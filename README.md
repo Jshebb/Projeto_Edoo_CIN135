@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="release/sprites/logo.png" width="300" height="300" alt="C+Mine, nome do jogo">
+  <img src="sprites/logo.png" width="300" height="300" alt="C+Mine, nome do jogo">
 </p>
 
 # Projeto Edoo CIN135: C+Mine
@@ -7,9 +7,9 @@ C+Mine é um jogo do gênero sandbox que gera um mundo aleatóriamente, permitin
 
 ## Capturas de Tela
 <div style="display: flex; justify-content: space-around;">
-  <img src="release/sprites/menupixel.png" alt="Imagem 1">
-  <img src="release/sprites/capturacmine1.PNG" alt="Imagem 2" width="500">
-  <img src="release/sprites/capturacmine3.PNG" alt="Imagem 3" width="500">
+  <img src="sprites/menupixel.png" alt="Imagem 1">
+  <img src="sprites/capturacmine1.PNG" alt="Imagem 2" width="500">
+  <img src="sprites/capturacmine3.PNG" alt="Imagem 3" width="500">
 </div>
 
 ## Membros (feito com muito amor por): 

@@ -6,6 +6,7 @@
 
 int main() 
 {
+    
     const Color Black = {0, 0, 0, 255}; // definicao de cor para fundo de tela
     constexpr int screenWidth = 1280;   // dimensoes de tela do jogo
     constexpr int screenHeight = 720;   // dimensoes de tela do jogo

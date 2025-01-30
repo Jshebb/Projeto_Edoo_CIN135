@@ -27,13 +27,16 @@ C+Mine é um jogo do gênero sandbox que gera um mundo aleatóriamente, permitin
 * Linguagem: __C++__
 * Bibliotecas: __Raylib__ (Gráficos e Input) e __SimplexNoise__ (Geração aleatória de mundo)
 
-## Como Jogar
-* Inicie o jogo e __escolha o tamanho do mapa__ (Pequeno, Médio ou Grande).
+## Como Jogar?
+* __Inicie__ o jogo e __escolha o tamanho do mapa__ (Pequeno, Médio ou Grande).
 * __Navegue__ pelo mundo utilizando as teclas __A__ e __D__.
 * __Pule__ com a tecla __Espaço__.
 * __Quebre blocos__ com o __botão esquerdo__ do mouse.
 * __Coloque blocos__ com o __botão direito__ do mouse, caso tenha itens no inventário.
 * __Gerencie seu inventário__ com as teclas __1 a 8__ ou o __scroll__ do mouse.
+
+## Instalação:
+Na aba Releases do repositório no GitHub, há um arquivo __.zip__ disponível para download. Basta acessar essa aba, baixar o arquivo, extrair o conteúdo e executar o jogo.
 
 ## Assets
 Player Sprites - SunnyLand free 2d sprite collection, all credits to original asset creator at https://ansimuz.itch.io/sunny-land-pixel-game-art

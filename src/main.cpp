@@ -6,12 +6,12 @@
 
 int main() 
 {
-    const Color Black = {0, 0, 0, 255};
-    constexpr int screenWidth = 1280;
-    constexpr int screenHeight = 720;
+    const Color Black = {0, 0, 0, 255}; // definicao de cor para fundo de tela
+    constexpr int screenWidth = 1280;   // dimensoes de tela do jogo
+    constexpr int screenHeight = 720;   // dimensoes de tela do jogo
 
-    InitWindow(screenWidth, screenHeight, "My first RAYLIB program!");
-    SetTargetFPS(60);
+    InitWindow(screenWidth, screenHeight, "C+Mine");  // inializa a tela do jogo
+    SetTargetFPS(60); // taxa de quadros por segundo
 
     bool showMenu = true;
     bool chooseMapSize = false; // LM Controle de escolha do tamanho do mapa

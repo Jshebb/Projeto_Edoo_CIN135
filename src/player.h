@@ -5,58 +5,82 @@
 #include "tilemap.h"
 #include "inventory.h"
 
-class Player {
-private:
-    // Player properties
-    Vector2 position;          // Player position
-    Vector2 speed;             // Player speed
-    int width, height;         // Dimensions of the player
-    float maxSpeed;            // Maximum speed
-    float gravity;             // Gravity strength
-    float friction;            // Horizontal friction
-    bool grounded;             // Whether the player is on the ground
+/// --- CLASSE PLAYER ---  
+// Controla todas as propriedades e comportamentos do jogador no jogo, incluindo:  
+// - Movimentação e física (gravidade, atrito, colisões)  
+// - Animação e renderização do sprite  
+// - Interação com a câmera e limites do mundo  
+//--------------------------------------------------------------------------------  
 
-    // Collision rectangles
-    Rectangle playerRec;       // Rectangle representing the player's bounds
-    Rectangle belowRec;        // Rectangle below the player for ground collision
+class Player {  
+private:  
+    // ======================  
+    // PROPRIEDADES FÍSICAS  
+    // ======================  
+    Vector2 position;          // Posição central do jogador no mundo (coordenadas X,Y)  
+    Vector2 speed;             // Velocidade atual nos eixos (X: horizontal, Y: vertical)  
+    int width, height;         // Dimensões da hitbox (normalmente menor que o sprite visual)  
+    float maxSpeed;            // Velocidade máxima permitida (evita aceleração infinita)  
+    float gravity;             // Força aplicada a cada frame quando no ar (simula gravidade)  
+    float friction;            // Resistência que reduz velocidade horizontal quando solta tecla  
+    bool grounded;             // Flag que indica contato com superfície (afeta pulo/queda)  
 
-    // Sprite and animation
-    Texture2D playerSprite;    // Player sprite sheet
-    int currentFrame;          // Current animation frame
-    float frameTime;           // Time accumulator for frame updates
-    float frameDuration;       // Duration of each frame (in seconds)
-    bool isFlipped; //Se o sprite do player for espelhado
+    // ======================  
+    // SISTEMA DE COLISÃO  
+    // ======================  
+    Rectangle playerRec;       // Área de colisão principal (usada para interagir com objetos)  
+    Rectangle belowRec;        // Sensor de chão (detecta plataformas abaixo do jogador)  
 
-    // Camera
-    Camera2D camera;           // Camera
+    // ======================  
+    // ANIMAÇÃO E SPRITE  
+    // ======================  
+    Texture2D playerSprite;    // Textura contendo todos os frames de animação (spritesheet)  
+    int currentFrame;          // Índice do frame atual na spritesheet (0 a n)  
+    float frameTime;           // Cronômetro para controle de tempo entre frames  
+    float frameDuration;       // Tempo necessário (em segundos) para avançar para próximo frame  
+    bool isFlipped;            // Controla espelhamento horizontal do sprite (direção esquerda)  
 
-    // Private helper methods
-    void updateRectangles();   // Updates `playerRec` and `belowRec`
-    void updateAnimation();    // Updates animation frames based on player state
+    // ======================  
+    // CONTROLE DE CÂMERA  
+    // ======================  
+    Camera2D camera;           // Configurações da câmera que segue o jogador suavemente  
 
+    // ======================  
+    // MÉTODOS INTERNOS  
+    // ======================  
+    void updateRectangles();   // Atualiza geometria de colisão após movimento  
+    void updateAnimation();    // Gerencia transições de animação baseadas no estado do jogador  
+
+
+    // [Exemplo de fluxo de uso:]  
+    // 1. Update() atualiza posição via input/física  
+    // 2. updateRectangles() ajusta hitboxes  
+    // 3. handleCollisions() resolve colisões com tilemap  
+    // 4. updateAnimation() avança frames conforme estado  
+    // 5. Draw() renderiza sprite na posição final  
 public:
-    Player();                  // Constructor
+    Player();                  // Construtor
 
-    // Player states for animations
+    // Estados do jogador para animações
     enum PlayerState { 
-        IDLE,                  // Idle state
-        RUNNING,               // Running state
-        JUMPING,               // Jumping state
-        FALLING                // Falling state
+        IDLE,                  // Estado parado
+        RUNNING,               // Estado correndo
+        JUMPING,               // Estado pulando
+        FALLING                // Estado caindo
     };
 
-    PlayerState currentState;  // Current state of the player
+    PlayerState currentState;  // Estado atual do jogador
 
-    // Public methods
-    void Update(const Tilemap& tilemap, float deltaTime);  // Updates player movement, collisions, and animations
-    void Draw() const;                    // Draws the player on the screen
+    // Métodos públicos
+    void Update(const Tilemap& tilemap, float deltaTime);  // Atualiza o movimento, colisões e animações do jogador
+    void Draw() const;                    // Desenha o jogador na tela
 
     // Getters
     Vector2 getPosition() const;
     Vector2 getSpeed() const;
     Rectangle getRec() const;
     bool isGrounded() const;
-    Camera2D getCamera() const; // Obtain the camera
+    Camera2D getCamera() const; 
     int getHeight();
     int getcurrentStateFrameCount(PlayerState state) const;
 
@@ -65,7 +89,7 @@ public:
     void setSpeed(Vector2 newSpeed);
     void setSprite(Texture2D sprite);
 
-    // Initialization
+    // inicializacao da camera
     void initializeCamera(Tilemap tilemap);
 };
 

@@ -8,8 +8,8 @@ C+Mine é um jogo do gênero sandbox que gera um mundo aleatóriamente, permitin
 ## Capturas de Tela
 <div style="display: flex; justify-content: space-around;">
   <img src="release/sprites/menupixel.png" alt="Imagem 1">
-  <img src="release/sprites/capturacmine1.PNG" alt="Imagem 2" width="462">
-  <img src="release/sprites/capturacmine3.PNG" alt="Imagem 3" width="462">
+  <img src="release/sprites/capturacmine1.PNG" alt="Imagem 2" width="500">
+  <img src="release/sprites/capturacmine3.PNG" alt="Imagem 3" width="500">
 </div>
 
 ## Membros (feito com muito amor por): 

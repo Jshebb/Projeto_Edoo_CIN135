@@ -5,10 +5,13 @@
 # Projeto Edoo CIN135: C+Mine
 C+Mine é um jogo do gênero sandbox que gera um mundo aleatóriamente, permitindo exploração, mineração e interação com um ambiente dinâmico. O jogo é desenvolvido em C++ utilizando a biblioteca raylib para renderização gráfica e SimplexNoise para a geração de terreno.
 
+## 🌐 GitHub Pages
+[🔗 Acesse o site aqui](http://jshebb.github.io/Projeto_Edoo_CIN135/)
+
 ## Capturas de Tela
 <div style="display: flex-col; justify-content: space-around;">
   <img src="release/sprites/menupixel.png" alt="Imagem 1">
-  <img src="release/sprites/capturacmine1.PNG" alt="Imagem 2"">
+  <img src="release/sprites/capturacmine1.PNG" alt="Imagem 2">
   <img src="release/sprites/capturacmine3.PNG" alt="Imagem 3">
 </div>
 

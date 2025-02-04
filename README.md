@@ -8,6 +8,9 @@ C+Mine é um jogo do gênero sandbox que gera um mundo aleatóriamente, permitin
 ## 🌐 GitHub Pages
 [🔗 Acesse o site aqui](http://jshebb.github.io/Projeto_Edoo_CIN135/)
 
+## 📺 Link para video no Youtube
+[🔗 Acesse o vídeo aqui](https://www.youtube.com/watch?v=n_qQGJR_j6c)
+
 ## Capturas de Tela
 <div style="display: flex-col; justify-content: space-around;">
   <img src="release/sprites/menupixel.png" alt="Imagem 1">
